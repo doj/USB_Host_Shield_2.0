@@ -603,9 +603,11 @@ uint8_t USB::AttemptConfig(uint8_t driver, uint8_t parent, uint8_t port, bool lo
         uint8_t retries = 0;
 
 again:
-        uint8_t rcode = devConfig[driver]->ConfigureDevice(parent, port, lowspeed);
+        uint32_t rcode = devConfig[driver]->ConfigureDevice(parent, port, lowspeed);
         if(rcode == USB_ERROR_CONFIG_REQUIRES_ADDITIONAL_RESET) {
           ResetPort(parent, port);
+	} else if(rcode == USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED) {
+	  return rcode;
         } else if(rcode == hrJERR && retries < 3) { // Some devices returns this when plugged in - trying to initialize the device again usually works
                 delay(100);
                 retries++;
@@ -614,10 +616,12 @@ again:
                 return rcode;
 
         rcode = devConfig[driver]->Init(parent, port, lowspeed);
-        if(rcode == hrJERR && retries < 3) { // Some devices returns this when plugged in - trying to initialize the device again usually works
+        if(rcode != 0/*hrJERR*/ && retries < 3) { // Some devices returns this when plugged in - trying to initialize the device again usually works
+	  if(rcode != USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED) {
                 delay(100);
                 retries++;
                 goto again;
+	  }
         }
         if(rcode) {
                 // Issue a bus reset, because the device may be in a limbo state
