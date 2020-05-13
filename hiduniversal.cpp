@@ -270,7 +270,6 @@ FailSetConfDescr:
         goto Fail;
 #endif
 
-
 FailSetIdle:
 #ifdef DEBUG_USB_HOST
         USBTRACE("SetIdle:");
@@ -295,7 +294,10 @@ HIDUniversal::HIDInterface* HIDUniversal::FindInterface(uint8_t iface, uint8_t a
 void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint8_t proto, const USB_ENDPOINT_DESCRIPTOR *pep) {
         // If the first configuration satisfies, the others are not concidered.
         if(bNumEP > 1 && conf != bConfNum)
+	  {
+	    USBTRACE("EndpointXtract:no");
                 return;
+	  }
 
         //ErrorMessage<uint8_t>(PSTR("\r\nConf.Val"), conf);
         //ErrorMessage<uint8_t>(PSTR("Iface Num"), iface);
@@ -313,7 +315,13 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
                 piface->bmAltSet = alt;
                 piface->bmProtocol = proto;
                 bNumIface++;
+		Notifyc(bNumIface+'0',0x80);
+		NotifyStr("piface\n",0x80);
         }
+	else
+	  {
+	    NotifyStr("!piface",0x80);
+	  }
 
         if((pep->bmAttributes & bmUSB_TRANSFER_TYPE) == USB_TRANSFER_TYPE_INTERRUPT)
                 index = (pep->bEndpointAddress & 0x80) == 0x80 ? epInterruptInIndex : epInterruptOutIndex;
@@ -334,6 +342,10 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
 
                 bNumEP++;
         }
+	else
+	  {
+	    USBTRACE("EndpointXtract:i");
+	  }
         //PrintEndpointDescriptor(pep);
 }
 
@@ -347,6 +359,7 @@ uint8_t HIDUniversal::Release() {
         return 0;
 }
 
+// \todo should be memcmp()
 bool HIDUniversal::BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2) {
         for(uint8_t i = 0; i < len; i++)
                 if(buf1[i] != buf2[i])
@@ -354,11 +367,13 @@ bool HIDUniversal::BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2) {
         return true;
 }
 
+// \todo should be memset()
 void HIDUniversal::ZeroMemory(uint8_t len, uint8_t *buf) {
         for(uint8_t i = 0; i < len; i++)
                 buf[i] = 0;
 }
 
+// \todo should be memcpy()
 void HIDUniversal::SaveBuffer(uint8_t len, uint8_t *src, uint8_t *dest) {
         for(uint8_t i = 0; i < len; i++)
                 dest[i] = src[i];
@@ -398,8 +413,11 @@ uint8_t HIDUniversal::Poll() {
 
                         if(identical)
                                 return 0;
-#if 0
-                        Notify(PSTR("\r\nBuf: "), 0x80);
+#if defined(DEBUG_USB_HOST)
+			Notifyc(i+'0', 0x80);
+			Notifyc('/', 0x80);
+			Notifyc(index+'0', 0x80);
+                        NotifyStr("Buf:", 0x80);
 
                         for(uint8_t i = 0; i < read; i++) {
                                 D_PrintHex<uint8_t > (buf[i], 0x80);

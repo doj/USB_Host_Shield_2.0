@@ -169,10 +169,25 @@ bool ConfigDescParser<CLASS_ID, SUBCLASS_ID, PROTOCOL_ID, MASK>::ParseDescriptor
                                         break;
                                 case USB_DESCRIPTOR_ENDPOINT:
                                         if(!valParser.Parse(pp, pcntdn))
+					  {
+					    NotifyStr("!valParser\n",0x80);
                                                 return false;
+					  }
                                         if(isGoodInterface)
+					  {
                                                 if(theXtractor)
+						  {
                                                         theXtractor->EndpointXtract(confValue, ifaceNumber, ifaceAltSet, protoValue, (USB_ENDPOINT_DESCRIPTOR*)varBuffer);
+						  }
+						else
+						  {
+						    NotifyStr("!Xtrac\n",0x80);
+						  }
+					  }
+					else
+					  {
+					    NotifyStr("!goodIf\n",0x80);
+					  }
                                         break;
                                         //case HID_DESCRIPTOR_HID:
                                         //      if (!valParser.Parse(pp, pcntdn))
@@ -181,7 +196,10 @@ bool ConfigDescParser<CLASS_ID, SUBCLASS_ID, PROTOCOL_ID, MASK>::ParseDescriptor
                                         //      break;
                                 default:
                                         if(!theSkipper.Skip(pp, pcntdn, dscrLen - 2))
+					  {
+					    NotifyStr("!skip\n",0x80);
                                                 return false;
+					  }
                         }
                         theBuffer.pValue = varBuffer;
                         stateParseDescr = 0;

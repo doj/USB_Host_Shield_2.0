@@ -52,7 +52,7 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         uint8_t len = 0;
         uint16_t cd_len = 0;
 
-        //USBTRACE("\r\nHub Init Start ");
+        USBTRACE("\r\nHub Init Start ");
         //D_PrintHex<uint8_t > (bInitState, 0x80);
 
         AddressPool &addrPool = pUsb->GetAddressPool();
@@ -118,7 +118,7 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return rcode;
         }
 
-        //USBTRACE2("\r\nHub address: ", bAddress );
+        USBTRACE2("\r\nHub address: ", bAddress );
 
         // Restore p->epinfo
         p->epinfo = oldep_ptr;
@@ -164,9 +164,7 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // It only intended for the usb protocol sniffer to properly parse hub-class requests.
         {
                 uint8_t buf2[24];
-
                 rcode = pUsb->getConfDescr(bAddress, 0, buf[0], 0, buf2);
-
                 if(rcode)
                         goto FailGetConfDescr;
         }
@@ -189,27 +187,30 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         //                bInitState = 0;
         //}
         //bInitState = 0;
-        //USBTRACE("...OK\r\n");
+        USBTRACE("OK\r\n");
         return 0;
 
-        // Oleg, No debugging?? -- xxxajk
 FailGetDevDescr:
+        USBTRACE("failGetDevDesc\r\n");
         goto Fail;
 
 FailSetDevTblEntry:
+        USBTRACE("failSetDevTblE\r\n");
         goto Fail;
 
 FailGetHubDescr:
+        USBTRACE("failGetHubDesc\r\n");
         goto Fail;
 
 FailGetConfDescr:
+        USBTRACE("failGetConfDesc\r\n");
         goto Fail;
 
 FailSetConfDescr:
+        USBTRACE("failSetConfDesc\r\n");
         goto Fail;
 
 Fail:
-        USBTRACE("...FAIL\r\n");
         return rcode;
 }
 
@@ -314,7 +315,6 @@ void USBHub::ResetHubPort(uint8_t port) {
         ClearPortFeature(HUB_FEATURE_C_PORT_ENABLE, port, 0);
         ClearPortFeature(HUB_FEATURE_C_PORT_CONNECTION, port, 0);
         SetPortFeature(HUB_FEATURE_PORT_RESET, port, 0);
-
 
         for(int i = 0; i < 3; i++) {
                 rcode = GetPortStatus(port, 4, evt.evtBuff);
