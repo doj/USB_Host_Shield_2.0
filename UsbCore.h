@@ -154,8 +154,8 @@ public:
                 return 0;
         }
 
-        virtual void ResetHubPort(uint8_t port __attribute__((unused))) {
-                return;
+        virtual uint32_t ResetHubPort(uint8_t port __attribute__((unused))) {
+                return USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED;
         } // Note used for hubs only!
 
         virtual bool VIDPIDOK(uint16_t vid __attribute__((unused)), uint16_t pid __attribute__((unused))) {
@@ -277,7 +277,7 @@ private:
         uint8_t OutTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t nbytes, uint8_t *data);
         uint8_t InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, uint8_t *data, uint8_t bInterval = 0);
         uint8_t AttemptConfig(uint8_t driver, uint8_t parent, uint8_t port, bool lowspeed);
-	void ResetPort(uint32_t hub, uint32_t port);
+	void ResetPort(uint32_t parent, uint32_t port);
 };
 
 #if 0 //defined(USB_METHODS_INLINE)

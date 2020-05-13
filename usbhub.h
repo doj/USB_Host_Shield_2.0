@@ -194,7 +194,7 @@ public:
         uint8_t Init(uint8_t parent, uint8_t port, bool lowspeed);
         uint8_t Release();
         uint8_t Poll();
-        void ResetHubPort(uint8_t port);
+        uint32_t ResetHubPort(uint32_t port);
 
         virtual uint8_t GetAddress() {
                 return bAddress;
