@@ -277,6 +277,7 @@ private:
         uint8_t OutTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t nbytes, uint8_t *data);
         uint8_t InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, uint8_t *data, uint8_t bInterval = 0);
         uint8_t AttemptConfig(uint8_t driver, uint8_t parent, uint8_t port, bool lowspeed);
+	void ResetPort(uint32_t hub, uint32_t port);
 };
 
 #if 0 //defined(USB_METHODS_INLINE)
