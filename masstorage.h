@@ -532,7 +532,7 @@ public:
         uint8_t Release();
         uint8_t Poll();
 
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return bAddress;
         };
 

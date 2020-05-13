@@ -634,11 +634,11 @@ again:
         return rcode;
 }
 
-void USBHost::ResetPort(uint32_t parent, uint32_t port) {
+void USB::ResetPort(uint32_t parent, uint32_t port) {
     if(parent == 0) {
         // Send a bus reset on the root interface.
-        //regWr(rHCTL, bmBUSRST); //issue bus reset
-        UHD_BusReset();
+        regWr(rHCTL, bmBUSRST); //issue bus reset
+        //UHD_BusReset();
         delay(102); // delay 102ms, compensate for clock inaccuracy.
 	} else {
         uint32_t rcode = USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;

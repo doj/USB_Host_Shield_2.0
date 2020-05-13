@@ -196,7 +196,7 @@ public:
         uint8_t Poll();
         uint32_t ResetHubPort(uint32_t port);
 
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return bAddress;
         };
 

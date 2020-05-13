@@ -87,6 +87,6 @@ public:
         // USBDeviceConfig implementation
         virtual uint8_t Init(uint8_t parent, uint8_t port, bool lowspeed);
         virtual uint8_t Release();
-        virtual uint8_t GetAddress() { return bAddress; };
+        virtual uint32_t GetAddress() { return bAddress; };
 };
 #endif //_USBH_MIDI_H_

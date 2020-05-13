@@ -318,7 +318,7 @@ uint8_t USBHub::CheckHubStatus() {
 uint32_t USBHub::ResetHubPort(uint32_t port) {
         HubEvent evt;
         evt.bmEvent = 0;
-        uintre_t rcode;
+        uint32_t rcode;
 
         ClearPortFeature(HUB_FEATURE_C_PORT_ENABLE, port, 0);
         ClearPortFeature(HUB_FEATURE_C_PORT_CONNECTION, port, 0);

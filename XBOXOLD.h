@@ -75,7 +75,7 @@ public:
          * Get the device address.
          * @return The device address.
          */
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return bAddress;
         };
 

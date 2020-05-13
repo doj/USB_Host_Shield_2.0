@@ -206,7 +206,7 @@ public:
                 return false;
         };
 
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return bAddress;
         };
 

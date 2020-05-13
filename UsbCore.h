@@ -150,7 +150,7 @@ public:
                 return 0;
         }
 
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return 0;
         }
 
