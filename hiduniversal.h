@@ -21,6 +21,8 @@ e-mail   :  support@circuitsathome.com
 #include "usbhid.h"
 //#include "hidescriptorparser.h"
 
+#define HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER 0
+
 class HIDUniversal : public USBHID {
 
         struct ReportParser {
@@ -49,16 +51,18 @@ class HIDUniversal : public USBHID {
         uint32_t qNextPollTime; // next poll time
         uint8_t pollInterval;
         bool bPollEnable; // poll enable flag
-
         static const uint16_t constBuffLen = 64; // event buffer length
-        uint8_t prevBuf[constBuffLen]; // previous event buffer
 
         void Initialize();
         HIDInterface* FindInterface(uint8_t iface, uint8_t alt, uint8_t proto);
 
         void ZeroMemory(uint8_t len, uint8_t *buf);
+
+#if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
+        uint8_t prevBuf[constBuffLen]; // previous event buffer
         bool BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2);
         void SaveBuffer(uint8_t len, uint8_t *src, uint8_t *dest);
+#endif
 
 protected:
         EpInfo epInfo[totalEndpoints];
@@ -82,7 +86,10 @@ protected:
 public:
         HIDUniversal(USB *p);
 
-        // HID implementation
+        /**
+	 * HID implementation.
+	 * @param id must be > 0.
+	 */
         bool SetReportParser(uint8_t id, HIDReportParser *prs);
 
         // USBDeviceConfig implementation

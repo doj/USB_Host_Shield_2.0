@@ -68,7 +68,9 @@ void HIDUniversal::Initialize() {
         bConfNum = 0;
         pollInterval = 0;
 
-        ZeroMemory(constBuffLen, prevBuf);
+#if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
+	memset(prevBuf, 0, constBuffLen);
+#endif
 }
 
 bool HIDUniversal::SetReportParser(uint8_t id, HIDReportParser *prs) {
@@ -108,7 +110,7 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("HU Init\r\n");
+        USBTRACE2("HU Init",(int)this);
 
         if(bAddress)
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
@@ -170,6 +172,7 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         //delay(2); //per USB 2.0 sect.9.2.6.3
 
+	USBTRACE2("HIDUniversal ",(int)this);
         USBTRACE2("Addr:", bAddress);
 
         p->lowspeed = false;
@@ -359,6 +362,7 @@ uint8_t HIDUniversal::Release() {
         return 0;
 }
 
+#if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
 // \todo should be memcmp()
 bool HIDUniversal::BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2) {
         for(uint8_t i = 0; i < len; i++)
@@ -367,17 +371,12 @@ bool HIDUniversal::BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2) {
         return true;
 }
 
-// \todo should be memset()
-void HIDUniversal::ZeroMemory(uint8_t len, uint8_t *buf) {
-        for(uint8_t i = 0; i < len; i++)
-                buf[i] = 0;
-}
-
 // \todo should be memcpy()
 void HIDUniversal::SaveBuffer(uint8_t len, uint8_t *src, uint8_t *dest) {
         for(uint8_t i = 0; i < len; i++)
                 dest[i] = src[i];
 }
+#endif
 
 uint8_t HIDUniversal::Poll() {
         uint8_t rcode = 0;
@@ -394,7 +393,7 @@ uint8_t HIDUniversal::Poll() {
                         uint8_t index = hidInterfaces[i].epIndex[epInterruptInIndex];
                         uint16_t read = (uint16_t)epInfo[index].maxPktSize;
 
-                        ZeroMemory(constBuffLen, buf);
+                        memset(buf, 0, constBuffLen);
 
                         uint8_t rcode = pUsb->inTransfer(bAddress, epInfo[index].epAddr, &read, buf);
 
@@ -407,12 +406,13 @@ uint8_t HIDUniversal::Poll() {
                         if(read > constBuffLen)
                                 read = constBuffLen;
 
+#if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
                         bool identical = BuffersIdentical(read, buf, prevBuf);
-
                         SaveBuffer(read, buf, prevBuf);
-
                         if(identical)
                                 return 0;
+#endif
+
 #if defined(DEBUG_USB_HOST)
 			Notifyc(i+'0', 0x80);
 			Notifyc('/', 0x80);

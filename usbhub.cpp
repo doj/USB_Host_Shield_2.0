@@ -52,7 +52,7 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         uint8_t len = 0;
         uint16_t cd_len = 0;
 
-        USBTRACE("\r\nHub Init Start ");
+        USBTRACE2("Hub Init Start",(int)this);
         //D_PrintHex<uint8_t > (bInitState, 0x80);
 
         AddressPool &addrPool = pUsb->GetAddressPool();
@@ -60,16 +60,25 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         //switch (bInitState) {
         //        case 0:
         if(bAddress)
+	  {
+	    USBTRACE2("addr inuse",(int)this);
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
+	  }
 
         // Get pointer to pseudo device with address 0 assigned
         p = addrPool.GetUsbDevicePtr(0);
 
         if(!p)
+	  {
+	    USBTRACE2("!pool",(int)this);
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
+	  }
 
         if(!p->epinfo)
+	  {
+	    USBTRACE2("!epinfo",(int)this);
                 return USB_ERROR_EPINFO_IS_NULL;
+	  }
 
         // Save old pointer to EP_RECORD of address 0
         oldep_ptr = p->epinfo;
@@ -90,19 +99,26 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         if(rcode) {
                 // Restore p->epinfo
                 p->epinfo = oldep_ptr;
+		USBTRACE2("rcode1 ", rcode);
                 return rcode;
         }
 
         // Extract device class from device descriptor
         // If device class is not a hub return
         if(udd->bDeviceClass != 0x09)
+	  {
+	    USBTRACE2("!dev ",(int)udd->bDeviceClass);
                 return USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED;
+	  }
 
         // Allocate new address according to device class
         bAddress = addrPool.AllocAddress(parent, (udd->bDeviceClass == 0x09) ? true : false, port);
 
         if(!bAddress)
+	  {
+	    USBTRACE2("!addr ",(int)this);
                 return USB_ERROR_OUT_OF_ADDRESS_SPACE_IN_POOL;
+	  }
 
         // Extract Max Packet Size from the device descriptor
         epInfo[0].maxPktSize = udd->bMaxPacketSize0;
@@ -115,10 +131,11 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 p->epinfo = oldep_ptr;
                 addrPool.FreeAddress(bAddress);
                 bAddress = 0;
+		USBTRACE2("rcode2 ", rcode);
                 return rcode;
         }
 
-        USBTRACE2("\r\nHub address: ", bAddress );
+        USBTRACE2("Hub address ", bAddress );
 
         // Restore p->epinfo
         p->epinfo = oldep_ptr;

@@ -187,6 +187,7 @@ bool ConfigDescParser<CLASS_ID, SUBCLASS_ID, PROTOCOL_ID, MASK>::ParseDescriptor
 					else
 					  {
 					    NotifyStr("!goodIf\n",0x80);
+					    //return false;//DOJ
 					  }
                                         break;
                                         //case HID_DESCRIPTOR_HID:

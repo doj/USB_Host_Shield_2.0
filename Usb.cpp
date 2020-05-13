@@ -497,7 +497,10 @@ void USB::Task(void) //USB state machine
 
                         for(uint8_t i = 0; i < USB_NUMDEVICES; i++)
                                 if(devConfig[i])
+				  {
+				    USBTRACE2("release ",i);
                                         rcode = devConfig[i]->Release();
+				  }
 
                         usb_task_state = USB_DETACHED_SUBSTATE_WAIT_FOR_DEVICE;
                         break;
@@ -644,6 +647,7 @@ again:
  * This is broken. We need to enumerate differently.
  * It causes major problems with several devices if detected in an unexpected order.
  *
+ * DOJ: fix this.
  *
  * Oleg - I wouldn't do anything before the newly connected device is considered sane.
  * i.e.(delays are not indicated for brevity):

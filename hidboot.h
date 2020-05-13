@@ -221,6 +221,9 @@ class HIDBoot : public USBHID //public USBDeviceConfig, public UsbConfigXtracter
 public:
         HIDBoot(USB *p, bool bRptProtoEnable = false);
 
+	/**
+	 * @param id valid values: 0 or 1 depending on the BOOT_PROTOCOL template parameter.
+	 */
         virtual bool SetReportParser(uint8_t id, HIDReportParser *prs) {
                 pRptParser[id] = prs;
                 return true;
@@ -460,17 +463,17 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
 
         // Yes, mouse wants SetProtocol and SetIdle too!
         for(uint8_t i = 0; i < epMUL(BOOT_PROTOCOL); i++) {
-                USBTRACE2("\r\nInterface:", i);
+                USBTRACE2("Interface:", i);
                 rcode = SetProtocol(i, bRptProtoEnable ? HID_RPT_PROTOCOL : USB_HID_BOOT_PROTOCOL);
                 if(rcode) goto FailSetProtocol;
-                USBTRACE2("PROTOCOL SET HID_BOOT rcode:", rcode);
+                USBTRACE2(" PROTOCOL SET HID_BOOT rcode:", rcode);
                 rcode = SetIdle(i, 0, 0);
-                USBTRACE2("SET_IDLE rcode:", rcode);
+                USBTRACE2(" SET_IDLE rcode:", rcode);
                 // if(rcode) goto FailSetIdle; This can fail.
                 // Get the RPIPE and just throw it away.
                 SinkParser<USBReadParser, uint16_t, uint16_t> sink;
                 rcode = GetReportDescr(i, &sink);
-                USBTRACE2("RPIPE rcode:", rcode);
+                USBTRACE2(" RPIPE rcode:", rcode);
         }
 
         // Get RPIPE and throw it away.

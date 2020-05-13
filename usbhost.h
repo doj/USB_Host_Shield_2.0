@@ -172,7 +172,7 @@ MAX3421e< SPI_SS, INTR >::MAX3421e() {
 #endif
 };
 
-/* write single byte into MAX3421 register */
+/** write single byte into MAX3421 register */
 template< typename SPI_SS, typename INTR >
 void MAX3421e< SPI_SS, INTR >::regWr(uint8_t reg, uint8_t data) {
         XMEM_ACQUIRE_SPI();
@@ -215,7 +215,7 @@ void MAX3421e< SPI_SS, INTR >::regWr(uint8_t reg, uint8_t data) {
 };
 /* multiple-byte write                            */
 
-/* returns a pointer to memory position after last written */
+/** @return a pointer to memory position after last written */
 template< typename SPI_SS, typename INTR >
 uint8_t* MAX3421e< SPI_SS, INTR >::bytesWr(uint8_t reg, uint8_t nbytes, uint8_t* data_p) {
         XMEM_ACQUIRE_SPI();
@@ -261,9 +261,9 @@ uint8_t* MAX3421e< SPI_SS, INTR >::bytesWr(uint8_t reg, uint8_t nbytes, uint8_t*
         XMEM_RELEASE_SPI();
         return ( data_p);
 }
-/* GPIO write                                           */
-/*GPIO byte is split between 2 registers, so two writes are needed to write one byte */
 
+/** GPIO write
+ * GPIO byte is split between 2 registers, so two writes are needed to write one byte */
 /* GPOUT bits are in the low nibble. 0-3 in IOPINS1, 4-7 in IOPINS2 */
 template< typename SPI_SS, typename INTR >
 void MAX3421e< SPI_SS, INTR >::gpioWr(uint8_t data) {
@@ -273,7 +273,7 @@ void MAX3421e< SPI_SS, INTR >::gpioWr(uint8_t data) {
         return;
 }
 
-/* single host register read    */
+/** single host register read    */
 template< typename SPI_SS, typename INTR >
 uint8_t MAX3421e< SPI_SS, INTR >::regRd(uint8_t reg) {
         XMEM_ACQUIRE_SPI();
@@ -312,7 +312,7 @@ uint8_t MAX3421e< SPI_SS, INTR >::regRd(uint8_t reg) {
 }
 /* multiple-byte register read  */
 
-/* returns a pointer to a memory position after last read   */
+/** @return a pointer to a memory position after last read   */
 template< typename SPI_SS, typename INTR >
 uint8_t* MAX3421e< SPI_SS, INTR >::bytesRd(uint8_t reg, uint8_t nbytes, uint8_t* data_p) {
         XMEM_ACQUIRE_SPI();
@@ -402,7 +402,7 @@ uint8_t MAX3421e< SPI_SS, INTR >::gpioRdOutput() {
         return ( gpout);
 }
 
-/* reset MAX3421E. Returns number of cycles it took for PLL to stabilize after reset
+/** reset MAX3421E. Returns number of cycles it took for PLL to stabilize after reset
   or zero if PLL haven't stabilized in 65535 cycles */
 template< typename SPI_SS, typename INTR >
 uint16_t MAX3421e< SPI_SS, INTR >::reset() {
@@ -417,7 +417,10 @@ uint16_t MAX3421e< SPI_SS, INTR >::reset() {
         return ( i);
 }
 
-/* initialize MAX3421E. Set Host mode, pullups, and stuff. Returns 0 if success, -1 if not */
+/** initialize MAX3421E. Set Host mode, pullups, and stuff
+ * @returns 0 if success, -1 if not.
+ * \todo refactor with Init(int mseconds)
+ */
 template< typename SPI_SS, typename INTR >
 int8_t MAX3421e< SPI_SS, INTR >::Init() {
         XMEM_ACQUIRE_SPI();
@@ -454,7 +457,11 @@ int8_t MAX3421e< SPI_SS, INTR >::Init() {
         return ( 0);
 }
 
-/* initialize MAX3421E. Set Host mode, pullups, and stuff. Returns 0 if success, -1 if not */
+/**
+ * initialize MAX3421E. Set Host mode, pullups, and stuff.
+ * @return 0 if success, -1 if not.
+ * \todo refactor with Init(int mseconds)
+ */
 template< typename SPI_SS, typename INTR >
 int8_t MAX3421e< SPI_SS, INTR >::Init(int mseconds) {
         XMEM_ACQUIRE_SPI();
@@ -498,7 +505,7 @@ int8_t MAX3421e< SPI_SS, INTR >::Init(int mseconds) {
         return ( 0);
 }
 
-/* probe bus to determine device presence and speed and switch host to this speed */
+/** probe bus to determine device presence and speed and switch host to this speed */
 template< typename SPI_SS, typename INTR >
 void MAX3421e< SPI_SS, INTR >::busprobe() {
         uint8_t bus_sample;
@@ -533,7 +540,7 @@ void MAX3421e< SPI_SS, INTR >::busprobe() {
         }//end switch( bus_sample )
 }
 
-/* MAX3421 state change task and interrupt handler */
+/** MAX3421 state change task and interrupt handler */
 template< typename SPI_SS, typename INTR >
 uint8_t MAX3421e< SPI_SS, INTR >::Task(void) {
         uint8_t rcode = 0;
