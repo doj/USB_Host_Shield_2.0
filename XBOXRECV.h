@@ -92,7 +92,7 @@ public:
          * Get the device address.
          * @return The device address.
          */
-        virtual uint8_t GetAddress() {
+        virtual uint32_t GetAddress() {
                 return bAddress;
         };
 
@@ -234,7 +234,7 @@ protected:
         /** Pointer to USB class instance. */
         USB *pUsb;
         /** Device address. */
-        uint8_t bAddress;
+        uint32_t bAddress;
         /** Endpoint info structure. */
         EpInfo epInfo[XBOX_MAX_ENDPOINTS];
 
