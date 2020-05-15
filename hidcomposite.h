@@ -55,8 +55,6 @@ class HIDComposite : public USBHID {
         void Initialize();
         HIDInterface* FindInterface(uint8_t iface, uint8_t alt, uint8_t proto);
 
-        void ZeroMemory(uint8_t len, uint8_t *buf);
-
 protected:
         EpInfo epInfo[totalEndpoints];
         HIDInterface hidInterfaces[maxHidInterfaces];

@@ -338,6 +338,12 @@ void HIDComposite::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
 }
 
 uint8_t HIDComposite::Release() {
+        for(uint8_t i = 0; i < MAX_REPORT_PARSERS; i++) {
+                if (rptParsers[i].rptParser) {
+                        rptParsers[i].rptParser->Release();
+                }
+        }
+
         pUsb->GetAddressPool().FreeAddress(bAddress);
 
         bNumEP = 1;
@@ -345,11 +351,6 @@ uint8_t HIDComposite::Release() {
         qNextPollTime = 0;
         bPollEnable = false;
         return 0;
-}
-
-void HIDComposite::ZeroMemory(uint8_t len, uint8_t *buf) {
-        for(uint8_t i = 0; i < len; i++)
-                buf[i] = 0;
 }
 
 uint8_t HIDComposite::Poll() {
@@ -370,8 +371,7 @@ uint8_t HIDComposite::Poll() {
                             continue;
 
                         uint16_t read = (uint16_t)epInfo[index].maxPktSize;
-
-                        ZeroMemory(constBuffLen, buf);
+			memset(buf, 0, constBuffLen);
 
                         uint8_t rcode = pUsb->inTransfer(bAddress, epInfo[index].epAddr, &read, buf);
 

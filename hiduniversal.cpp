@@ -354,6 +354,12 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
 }
 
 uint8_t HIDUniversal::Release() {
+        for(uint8_t i = 0; i < MAX_REPORT_PARSERS; i++) {
+                if (rptParsers[i].rptParser) {
+                        rptParsers[i].rptParser->Release();
+                }
+        }
+
         pUsb->GetAddressPool().FreeAddress(bAddress);
 
         bNumEP = 1;
@@ -362,22 +368,6 @@ uint8_t HIDUniversal::Release() {
         bPollEnable = false;
         return 0;
 }
-
-#if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
-// \todo should be memcmp()
-bool HIDUniversal::BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2) {
-        for(uint8_t i = 0; i < len; i++)
-                if(buf1[i] != buf2[i])
-                        return false;
-        return true;
-}
-
-// \todo should be memcpy()
-void HIDUniversal::SaveBuffer(uint8_t len, uint8_t *src, uint8_t *dest) {
-        for(uint8_t i = 0; i < len; i++)
-                dest[i] = src[i];
-}
-#endif
 
 uint8_t HIDUniversal::Poll() {
         uint8_t rcode = 0;
@@ -408,8 +398,8 @@ uint8_t HIDUniversal::Poll() {
                                 read = constBuffLen;
 
 #if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
-                        bool identical = BuffersIdentical(read, buf, prevBuf);
-                        SaveBuffer(read, buf, prevBuf);
+                        const bool identical = memcmp(buf, prevBuf, read) == 0;
+                        memcpy(prevBuf, buf, read);
                         if(identical)
                                 return 0;
 #endif
@@ -429,8 +419,7 @@ uint8_t HIDUniversal::Poll() {
 #endif
                         ParseHIDData(this, bHasReportId, (uint8_t)read, buf);
 
-                        HIDReportParser *prs = GetReportParser(((bHasReportId) ? *buf : 0));
-
+                        HIDReportParser *prs = GetReportParser(bHasReportId ? *buf : 0);
                         if(prs) {
                                 prs->Parse(this, bHasReportId, (uint8_t)read, buf);
                         } else {

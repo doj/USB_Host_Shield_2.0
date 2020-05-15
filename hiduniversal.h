@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -59,8 +60,6 @@ class HIDUniversal : public USBHID {
 
 #if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
         uint8_t prevBuf[constBuffLen]; // previous event buffer
-        bool BuffersIdentical(uint8_t len, uint8_t *buf1, uint8_t *buf2);
-        void SaveBuffer(uint8_t len, uint8_t *src, uint8_t *dest);
 #endif
 
 protected:

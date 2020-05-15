@@ -44,5 +44,6 @@ e-mail   :  support@circuitsathome.com
 #include "UsbCore.h"
 #include "parsetools.h"
 #include "confdescparser.h"
+#include "version.h"
 
 #endif //_usb_h_

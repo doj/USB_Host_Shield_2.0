@@ -38,7 +38,6 @@ e-mail   :  support@circuitsathome.com
 // #define HID_MAX_HID_CLASS_DESCRIPTORS 5
 
 struct MOUSEINFO {
-
         struct {
                 uint8_t bmLeftButton : 1;
                 uint8_t bmRightButton : 1;
@@ -572,6 +571,12 @@ void HIDBoot<BOOT_PROTOCOL>::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t
 
 template <const uint8_t BOOT_PROTOCOL>
 uint8_t HIDBoot<BOOT_PROTOCOL>::Release() {
+        for(int i = 0; i < epMUL(BOOT_PROTOCOL); i++) {
+                if (pRptParser[i]) {
+                        pRptParser[i]->Release();
+                }
+        }
+
         pUsb->GetAddressPool().FreeAddress(bAddress);
 
         bConfNum = 0;

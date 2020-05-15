@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -137,7 +138,17 @@ class USBHID;
 
 class HIDReportParser {
 public:
+        /**
+         * parse data received from the HID device.
+         * @param hid USBHID object that is calling Parse().
+         * @param is_rpt_id should be true if the report parser has an ID, it seems this parameter is currently always false.
+         * @param len length of @p buf in bytes.
+         * @param buf data received from the HID device.
+         */
         virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf) = 0;
+
+        /// called when the USB device is released (disconnected).
+        virtual void Release() {}
 };
 
 class USBHID : public USBDeviceConfig, public UsbConfigXtracter {
@@ -146,8 +157,8 @@ protected:
         uint8_t bAddress; // address
 
 protected:
-        static const uint8_t epInterruptInIndex = 1; // InterruptIN  endpoint index
-        static const uint8_t epInterruptOutIndex = 2; // InterruptOUT endpoint index
+        static const uint8_t epInterruptInIndex = 1; ///< InterruptIN  endpoint index
+        static const uint8_t epInterruptOutIndex = 2; ///< InterruptOUT endpoint index
 
         static const uint8_t maxHidInterfaces = 3;
         static const uint8_t maxEpPerInterface = 2;
@@ -156,22 +167,24 @@ protected:
         void PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr);
         void PrintHidDescriptor(const USB_HID_DESCRIPTOR *pDesc);
 
+        // \todo should this be an abstract method?
         virtual HIDReportParser* GetReportParser(uint8_t id __attribute__((unused))) {
                 return NULL;
-        };
+        }
 
 public:
 
         USBHID(USB *pusb) : pUsb(pusb) {
-        };
+        }
 
         const USB* GetUsb() {
                 return pUsb;
-        };
+        }
 
+        // \todo should this be an abstract method?
         virtual bool SetReportParser(uint8_t id __attribute__((unused)), HIDReportParser *prs __attribute__((unused))) {
                 return false;
-        };
+        }
 
         uint8_t SetProtocol(uint8_t iface, uint8_t protocol);
         uint8_t GetProtocol(uint8_t iface, uint8_t* dataptr);
