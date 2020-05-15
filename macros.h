@@ -31,8 +31,11 @@ e-mail   :  support@circuitsathome.com
 // HANDY MACROS
 ////////////////////////////////////////////////////////////////////////////////
 
+/// @return true if l < v < h.
 #define VALUE_BETWEEN(v,l,h) (((v)>(l)) && ((v)<(h)))
+/// @return true if l <= v <= h.
 #define VALUE_WITHIN(v,l,h) (((v)>=(l)) && ((v)<=(h)))
+
 #define output_pgm_message(wa,fp,mp,el) wa = &mp, fp((char *)pgm_read_pointer(wa), el)
 #define output_if_between(v,l,h,wa,fp,mp,el) if(VALUE_BETWEEN(v,l,h)) output_pgm_message(wa,fp,mp[v-(l+1)],el);
 
@@ -84,6 +87,4 @@ e-mail   :  support@circuitsathome.com
 #define USBTRACE2(s,r) (Notify(PSTR(s), 0x80), D_PrintHex((r), 0x80), Notify(PSTR("\r\n"), 0x80))
 #define USBTRACE3(s,r,l) (Notify(PSTR(s), l), D_PrintHex((r), l), Notify(PSTR("\r\n"), l))
 
-
 #endif /* MACROS_H */
-
