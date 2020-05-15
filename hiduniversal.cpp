@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -430,8 +431,11 @@ uint8_t HIDUniversal::Poll() {
 
                         HIDReportParser *prs = GetReportParser(((bHasReportId) ? *buf : 0));
 
-                        if(prs)
+                        if(prs) {
                                 prs->Parse(this, bHasReportId, (uint8_t)read, buf);
+                        } else {
+                                USBTRACE3("!GetReportParser:",bHasReportId,0x80);
+                        }
                 }
         }
         return rcode;

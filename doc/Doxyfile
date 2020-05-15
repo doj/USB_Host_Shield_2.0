@@ -2166,7 +2166,8 @@ PREDEFINED             = WIICAMERA \
                          ARDUINO=100 \
                          __attribute__(x)= \
                          PROGMEM \
-                         _usb_h_
+                         _usb_h_ \
+			 DEBUG_USB_HOST
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

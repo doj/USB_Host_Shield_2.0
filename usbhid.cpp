@@ -17,20 +17,7 @@ e-mail   :  support@circuitsathome.com
 
 #include "usbhid.h"
 
-//get HID report descriptor
-
-/* WRONG! Endpoint is _ALWAYS_ ZERO for HID! We want the _INTERFACE_ value here!
-uint8_t USBHID::GetReportDescr(uint8_t ep, USBReadParser *parser) {
-        const uint8_t constBufLen = 64;
-        uint8_t buf[constBufLen];
-
-        uint8_t rcode = pUsb->ctrlReq(bAddress, ep, bmREQ_HID_REPORT, USB_REQUEST_GET_DESCRIPTOR, 0x00,
-                HID_DESCRIPTOR_REPORT, 0x0000, 128, constBufLen, buf, (USBReadParser*)parser);
-
-        //return ((rcode != hrSTALL) ? rcode : 0);
-        return rcode;
-}
- */
+/// get HID report descriptor
 uint8_t USBHID::GetReportDescr(uint16_t wIndex, USBReadParser *parser) {
         const uint8_t constBufLen = 64;
         uint8_t buf[constBufLen];
@@ -41,11 +28,6 @@ uint8_t USBHID::GetReportDescr(uint16_t wIndex, USBReadParser *parser) {
         //return ((rcode != hrSTALL) ? rcode : 0);
         return rcode;
 }
-
-//uint8_t USBHID::getHidDescr( uint8_t ep, uint16_t nbytes, uint8_t* dataptr )
-//{
-//    return( pUsb->ctrlReq( bAddress, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, 0x00, HID_DESCRIPTOR_HID, 0x0000, nbytes, dataptr ));
-//}
 
 uint8_t USBHID::SetReport(uint8_t ep, uint8_t iface, uint8_t report_type, uint8_t report_id, uint16_t nbytes, uint8_t* dataptr) {
         return ( pUsb->ctrlReq(bAddress, ep, bmREQ_HID_OUT, HID_REQUEST_SET_REPORT, report_id, report_type, iface, nbytes, nbytes, dataptr, NULL));

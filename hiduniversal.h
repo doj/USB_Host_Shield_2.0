@@ -19,9 +19,8 @@ e-mail   :  support@circuitsathome.com
 #define __HIDUNIVERSAL_H__
 
 #include "usbhid.h"
-//#include "hidescriptorparser.h"
 
-#define HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER 0
+#define HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER 1
 
 class HIDUniversal : public USBHID {
 

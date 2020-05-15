@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -94,7 +95,6 @@ struct MODIFIERKEYS {
 };
 
 struct KBDINFO {
-
         struct {
                 uint8_t bmLeftCtrl : 1;
                 uint8_t bmLeftShift : 1;
@@ -257,10 +257,11 @@ public:
 
 template <const uint8_t BOOT_PROTOCOL>
 HIDBoot<BOOT_PROTOCOL>::HIDBoot(USB *p, bool bRptProtoEnable/* = false*/) :
-USBHID(p),
-qNextPollTime(0),
-bPollEnable(false),
-bRptProtoEnable(bRptProtoEnable) {
+    USBHID(p),
+    qNextPollTime(0),
+    bPollEnable(false),
+    bRptProtoEnable(bRptProtoEnable)
+{
         Initialize();
 
         for(int i = 0; i < epMUL(BOOT_PROTOCOL); i++) {
@@ -320,31 +321,26 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
+        p->lowspeed = lowspeed;
+
         // Save old pointer to EP_RECORD of address 0
         oldep_ptr = p->epinfo;
-
         // Temporary assign new pointer to epInfo to p->epinfo in order to avoid toggle inconsistence
         p->epinfo = epInfo;
-
-        p->lowspeed = lowspeed;
 
         // Get device descriptor
         rcode = pUsb->getDevDescr(0, 0, 8, (uint8_t*)buf);
 
-        if(!rcode)
-                len = (buf[0] > constBufSize) ? constBufSize : buf[0];
-
-        device = reinterpret_cast<USB_DEVICE_DESCRIPTOR*>(buf);
+        // Restore p->epinfo
+        p->epinfo = oldep_ptr;
 
         if(rcode) {
-                // Restore p->epinfo
-                p->epinfo = oldep_ptr;
-
                 goto FailGetDevDescr;
         }
 
-        // Restore p->epinfo
-        p->epinfo = oldep_ptr;
+        len = (buf[0] > constBufSize) ? constBufSize : buf[0];
+
+        device = reinterpret_cast<USB_DEVICE_DESCRIPTOR*>(buf);
 
         // Allocate new address according to device class
         bAddress = addrPool.AllocAddress(parent, false, port);
@@ -354,6 +350,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
 
         // Extract Max Packet Size from the device descriptor
         epInfo[0].maxPktSize = (uint8_t)(device->bMaxPacketSize0);
+        USBTRACE2("maxPktSize:", epInfo[0].maxPktSize);
 
         // Assign new address to the device
         rcode = pUsb->setAddr(0, 0, bAddress);
@@ -432,7 +429,6 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
                                 pUsb->getConfDescr(bAddress, 0, i, &confDescrParserB);
                                 if(bNumEP == ((uint8_t)(totalEndpoints(BOOT_PROTOCOL))))
                                         break;
-
                         }
                 }
         }
@@ -545,12 +541,17 @@ void HIDBoot<BOOT_PROTOCOL>::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t
         // If the first configuration satisfies, the others are not considered.
         //if(bNumEP > 1 && conf != bConfNum)
         if(bNumEP == totalEndpoints(BOOT_PROTOCOL))
+            {
+                USBTRACE2("EndpointXtract:",bNumEP);
                 return;
+            }
 
         bConfNum = conf;
         bIfaceNum = iface;
 
-        if((pep->bmAttributes & bmUSB_TRANSFER_TYPE) == USB_TRANSFER_TYPE_INTERRUPT && (pep->bEndpointAddress & 0x80) == 0x80) {
+        if((pep->bmAttributes & bmUSB_TRANSFER_TYPE) == USB_TRANSFER_TYPE_INTERRUPT &&
+           (pep->bEndpointAddress & 0x80) == 0x80)
+            {
                 if(pep->bInterval > bInterval) bInterval = pep->bInterval;
 
                 // Fill in the endpoint info structure
@@ -560,8 +561,13 @@ void HIDBoot<BOOT_PROTOCOL>::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t
                 epInfo[bNumEP].bmRcvToggle = 0;
                 epInfo[bNumEP].bmNakPower = USB_NAK_NOWAIT;
                 bNumEP++;
-
-        }
+                USBTRACE2("maxPktSize2:", epInfo[bNumEP].maxPktSize);
+            }
+        else
+            {
+                USBTRACE2("EX2:",pep->bmAttributes);
+                USBTRACE2("EX2:",pep->bEndpointAddress);
+            }
 }
 
 template <const uint8_t BOOT_PROTOCOL>
@@ -589,9 +595,9 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Poll() {
                         const uint16_t const_buff_len = 16;
                         uint8_t buf[const_buff_len];
 
-                        USBTRACE3("(hidboot.h) i=", i, 0x81);
-                        USBTRACE3("(hidboot.h) epInfo[epInterruptInIndex + i].epAddr=", epInfo[epInterruptInIndex + i].epAddr, 0x81);
-                        USBTRACE3("(hidboot.h) epInfo[epInterruptInIndex + i].maxPktSize=", epInfo[epInterruptInIndex + i].maxPktSize, 0x81);
+                        USBTRACE3("(hidboot.h) i=", i, 0x82);
+                        USBTRACE3("(hidboot.h) epInfo[epInterruptInIndex + i].epAddr=", epInfo[epInterruptInIndex + i].epAddr, 0x82);
+                        USBTRACE3("(hidboot.h) epInfo[epInterruptInIndex + i].maxPktSize=", epInfo[epInterruptInIndex + i].maxPktSize, 0x82);
                         uint16_t read = (uint16_t)epInfo[epInterruptInIndex + i].maxPktSize;
 
                         rcode = pUsb->inTransfer(bAddress, epInfo[epInterruptInIndex + i].epAddr, &read, buf);

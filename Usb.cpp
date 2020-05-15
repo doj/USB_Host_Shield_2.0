@@ -21,13 +21,13 @@ e-mail   :  support@circuitsathome.com
 static uint8_t usb_error = 0;
 static uint8_t usb_task_state;
 
-/* constructor */
+/** constructor */
 USB::USB() : bmHubPre(0) {
         usb_task_state = USB_DETACHED_SUBSTATE_INITIALIZE; //set up state machine
         init();
 }
 
-/* Initialize data structures */
+/** Initialize data structures */
 void USB::init() {
         //devConfigIndex = 0;
         bmHubPre = 0;
@@ -58,9 +58,9 @@ EpInfo* USB::getEpInfoEntry(uint8_t addr, uint8_t ep) {
         return NULL;
 }
 
-/* set device table entry */
-
-/* each device is different and has different number of endpoints. This function plugs endpoint record structure, defined in application, to devtable */
+/** set device table entry.
+ each device is different and has different number of endpoints.
+ This function plugs endpoint record structure, defined in application, to devtable */
 uint8_t USB::setEpInfoEntry(uint8_t addr, uint8_t epcount, EpInfo* eprecord_ptr) {
         if(!eprecord_ptr)
                 return USB_ERROR_INVALID_ARGUMENT;
@@ -117,12 +117,11 @@ uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_l
         return 0;
 }
 
-/* Control transfer. Sets address, endpoint, fills control packet with necessary data, dispatches control packet, and initiates bulk IN transfer,   */
-/* depending on request. Actual requests are defined as inlines                                                                                      */
-/* return codes:                */
-/* 00       =   success         */
-
-/* 01-0f    =   non-zero HRSLT  */
+/** Control transfer. Sets address, endpoint, fills control packet with necessary data, dispatches control packet, and initiates bulk IN transfer,
+ depending on request. Actual requests are defined as inlines.
+@return 00       =   success.
+@return 01-0f    =   non-zero HRSLT
+*/
 uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
         uint16_t wInd, uint16_t total, uint16_t nbytes, uint8_t* dataptr, USBReadParser *p) {
         bool direction = false; //request direction, IN or OUT
@@ -201,11 +200,19 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
         return dispatchPkt((direction) ? tokOUTHS : tokINHS, ep, nak_limit); //GET if direction
 }
 
-/* IN transfer to arbitrary endpoint. Assumes PERADDR is set. Handles multiple packets if necessary. Transfers 'nbytes' bytes. */
-/* Keep sending INs and writes data to memory area pointed by 'data'                                                           */
+/** IN transfer to arbitrary endpoint.
+ Assumes PERADDR is set.
+ Handles multiple packets if necessary.
+ Transfers @p nbytes bytes.
+ Keep sending INs and writes data to memory area pointed by @p data.
 
-/* rcode 0 if no errors. rcode 01-0f is relayed from dispatchPkt(). Rcode f0 means RCVDAVIRQ error,
-            fe USB xfer timeout */
+@param[in,out] nbytesptr number of bytes to read. Upon return the number of bytes that were read.
+
+@return 0 if no errors.
+@return 01-0f is relayed from dispatchPkt().
+@return f0 means RCVDAVIRQ error,
+@return fe USB xfer timeout
+ */
 uint8_t USB::inTransfer(uint8_t addr, uint8_t ep, uint16_t *nbytesptr, uint8_t* data, uint8_t bInterval /*= 0*/) {
         EpInfo *pep = NULL;
         uint16_t nak_limit = 0;
@@ -226,8 +233,9 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
         uint8_t pktsize;
 
         uint16_t nbytes = *nbytesptr;
-        //printf("Requesting %i bytes ", nbytes);
+	USBTRACE3("(USB::InTransfer) nbytes ", nbytes, 0x83);
         uint8_t maxpktsize = pep->maxPktSize;
+	USBTRACE3("(USB::InTransfer) maxbytes ", maxpktsize, 0x83);
 
         *nbytesptr = 0;
         regWr(rHCTL, (pep->bmRcvToggle) ? bmRCVTOG1 : bmRCVTOG0); //set toggle value
@@ -235,7 +243,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
         // use a 'break' to exit this loop
         while(1) {
 #if defined(ESP8266) || defined(ESP32)
-                        yield(); // needed in order to reset the watchdog timer on the ESP8266
+                yield(); // needed in order to reset the watchdog timer on the ESP8266
 #endif
                 rcode = dispatchPkt(tokIN, pep->epAddr, nak_limit); //IN packet to EP-'endpoint'. Function takes care of NAKS.
                 if(rcode == hrTOGERR) {
@@ -260,9 +268,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
                         break;
                 }
                 pktsize = regRd(rRCVBC); //number of received bytes
-                //printf("Got %i bytes \r\n", pktsize);
-                // This would be OK, but...
-                //assert(pktsize <= nbytes);
+		USBTRACE3("(USB::InTransfer) recv ", pktsize, 0x82);
                 if(pktsize > nbytes) {
                         // This can happen. Use of assert on Arduino locks up the Arduino.
                         // So I will trim the value, and hope for the best.
@@ -296,10 +302,13 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
         return ( rcode);
 }
 
-/* OUT transfer to arbitrary endpoint. Handles multiple packets if necessary. Transfers 'nbytes' bytes. */
-/* Handles NAK bug per Maxim Application Note 4000 for single buffer transfer   */
-
-/* rcode 0 if no errors. rcode 01-0f is relayed from HRSL                       */
+/** OUT transfer to arbitrary endpoint.
+ Handles multiple packets if necessary.
+ Transfers @p nbytes bytes.
+ Handles NAK bug per Maxim Application Note 4000 for single buffer transfer.
+@return 0 if no errors.
+@return 01-0f is relayed from HRSL
+*/
 uint8_t USB::outTransfer(uint8_t addr, uint8_t ep, uint16_t nbytes, uint8_t* data) {
         EpInfo *pep = NULL;
         uint16_t nak_limit = 0;
@@ -392,12 +401,15 @@ breakout:
         pep->bmSndToggle = (regRd(rHRSL) & bmSNDTOGRD) ? 1 : 0; //bmSNDTOG1 : bmSNDTOG0;  //update toggle
         return ( rcode); //should be 0 in all cases
 }
-/* dispatch USB packet. Assumes peripheral address is set and relevant buffer is loaded/empty       */
-/* If NAK, tries to re-send up to nak_limit times                                                   */
-/* If nak_limit == 0, do not count NAKs, exit after timeout                                         */
-/* If bus timeout, re-sends up to USB_RETRY_LIMIT times                                             */
 
-/* return codes 0x00-0x0f are HRSLT( 0x00 being success ), 0xff means timeout                       */
+/** dispatch USB packet.
+ Assumes peripheral address is set and relevant buffer is loaded/empty.
+ If NAK, tries to re-send up to nak_limit times.
+ If @p nak_limit == 0, do not count NAKs, exit after timeout.
+ If bus timeout, re-sends up to USB_RETRY_LIMIT times.
+ @return codes 0x00-0x0f are HRSLT( 0x00 being success ).
+@return 0xff means timeout.
+*/
 uint8_t USB::dispatchPkt(uint8_t token, uint8_t ep, uint16_t nak_limit) {
         uint32_t timeout = (uint32_t)millis() + USB_XFER_TIMEOUT;
         uint8_t tmpdata;
@@ -451,7 +463,7 @@ uint8_t USB::dispatchPkt(uint8_t token, uint8_t ep, uint16_t nak_limit) {
         return ( rcode);
 }
 
-/* USB main task. Performs enumeration/cleanup */
+/** USB main task. Performs enumeration/cleanup */
 void USB::Task(void) //USB state machine
 {
         uint8_t rcode;
@@ -643,7 +655,7 @@ again:
         return rcode;
 }
 
-/*
+/**
  * This is broken. We need to enumerate differently.
  * It causes major problems with several devices if detected in an unexpected order.
  *
@@ -715,10 +727,10 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
 
         // Temporary assign new pointer to epInfo to p->epinfo in order to
         // avoid toggle inconsistence
-
         p->epinfo = &epInfo;
 
         p->lowspeed = lowspeed;
+
         // Get device descriptor
         rcode = getDevDescr(0, 0, sizeof (USB_DEVICE_DESCRIPTOR), (uint8_t*)buf);
 
@@ -758,7 +770,6 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
                 return rcode;
         }
 
-
         // blindly attempt to configure
         for(devConfigIndex = 0; devConfigIndex < USB_NUMDEVICES; devConfigIndex++) {
                 if(!devConfig[devConfigIndex]) continue;
@@ -795,19 +806,23 @@ uint8_t USB::ReleaseDevice(uint8_t addr) {
 }
 
 #if 1 //!defined(USB_METHODS_INLINE)
-//get device descriptor
 
+/// get device descriptor
 uint8_t USB::getDevDescr(uint8_t addr, uint8_t ep, uint16_t nbytes, uint8_t* dataptr) {
         return ( ctrlReq(addr, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, 0x00, USB_DESCRIPTOR_DEVICE, 0x0000, nbytes, nbytes, dataptr, NULL));
 }
-//get configuration descriptor
 
+/// get configuration descriptor
 uint8_t USB::getConfDescr(uint8_t addr, uint8_t ep, uint16_t nbytes, uint8_t conf, uint8_t* dataptr) {
         return ( ctrlReq(addr, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, conf, USB_DESCRIPTOR_CONFIGURATION, 0x0000, nbytes, nbytes, dataptr, NULL));
 }
 
-/* Requests Configuration Descriptor. Sends two Get Conf Descr requests. The first one gets the total length of all descriptors, then the second one requests this
- total length. The length of the first request can be shorter ( 4 bytes ), however, there are devices which won't work unless this length is set to 9 */
+/** Requests Configuration Descriptor.
+ Sends two Get Conf Descr requests.
+ The first one gets the total length of all descriptors, then the second one requests this
+ total length.
+ The length of the first request can be shorter ( 4 bytes ), however, there are devices which won't work unless this length is set to 9
+ */
 uint8_t USB::getConfDescr(uint8_t addr, uint8_t ep, uint8_t conf, USBReadParser *p) {
         const uint8_t bufSize = 64;
         uint8_t buf[bufSize];
@@ -825,13 +840,12 @@ uint8_t USB::getConfDescr(uint8_t addr, uint8_t ep, uint8_t conf, USBReadParser 
         return ( ctrlReq(addr, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, conf, USB_DESCRIPTOR_CONFIGURATION, 0x0000, total, bufSize, buf, p));
 }
 
-//get string descriptor
-
+/// get string descriptor
 uint8_t USB::getStrDescr(uint8_t addr, uint8_t ep, uint16_t ns, uint8_t index, uint16_t langid, uint8_t* dataptr) {
         return ( ctrlReq(addr, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, index, USB_DESCRIPTOR_STRING, langid, ns, ns, dataptr, NULL));
 }
-//set address
 
+/// set address
 uint8_t USB::setAddr(uint8_t oldaddr, uint8_t ep, uint8_t newaddr) {
         uint8_t rcode = ctrlReq(oldaddr, ep, bmREQ_SET, USB_REQUEST_SET_ADDRESS, newaddr, 0x00, 0x0000, 0x0000, 0x0000, NULL, NULL);
         //delay(2); //per USB 2.0 sect.9.2.6.3
@@ -839,8 +853,8 @@ uint8_t USB::setAddr(uint8_t oldaddr, uint8_t ep, uint8_t newaddr) {
         return rcode;
         //return ( ctrlReq(oldaddr, ep, bmREQ_SET, USB_REQUEST_SET_ADDRESS, newaddr, 0x00, 0x0000, 0x0000, 0x0000, NULL, NULL));
 }
-//set configuration
 
+/// set configuration
 uint8_t USB::setConf(uint8_t addr, uint8_t ep, uint8_t conf_value) {
         return ( ctrlReq(addr, ep, bmREQ_SET, USB_REQUEST_SET_CONFIGURATION, conf_value, 0x00, 0x0000, 0x0000, 0x0000, NULL, NULL));
 }
