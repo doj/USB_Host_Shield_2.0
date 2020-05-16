@@ -86,8 +86,13 @@ bool HIDUniversal::SetReportParser(uint8_t id, HIDReportParser *prs) {
 }
 
 HIDReportParser* HIDUniversal::GetReportParser(uint8_t id) {
-        if(!bHasReportId)
+        // \todo is this wrong? If an id parameter is given, it will never be used if bHasReportId is false.
+        //       and bHasReportId seems to be always false, as it is never set to anything.
+        if(!bHasReportId) {
+                // \todo is this what is intended?
+                //       Or should it return rptParsers[0] is it is not NULL, otherwise use the for loop below?
                 return ((rptParsers[0].rptParser) ? rptParsers[0].rptParser : NULL);
+        }
 
         for(uint8_t i = 0; i < MAX_REPORT_PARSERS; i++) {
                 if(rptParsers[i].rptId == id)
