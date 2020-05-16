@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -365,13 +366,14 @@ uint8_t HIDComposite::Poll() {
                 uint8_t buf[constBuffLen];
 
                 for(uint8_t i = 0; i < bNumIface; i++) {
-                        uint8_t index = hidInterfaces[i].epIndex[epInterruptInIndex];
+                        const uint8_t index = hidInterfaces[i].epIndex[epInterruptInIndex];
 
                         if (index == 0)
                             continue;
 
                         uint16_t read = (uint16_t)epInfo[index].maxPktSize;
 			memset(buf, 0, constBuffLen);
+			// \todo should read be limited to constBuffLen?
 
                         uint8_t rcode = pUsb->inTransfer(bAddress, epInfo[index].epAddr, &read, buf);
 
@@ -389,20 +391,18 @@ uint8_t HIDComposite::Poll() {
 
 #if 0
                         Notify(PSTR("\r\nBuf: "), 0x80);
-
                         for(uint8_t i = 0; i < read; i++) {
                                 D_PrintHex<uint8_t > (buf[i], 0x80);
                                 Notify(PSTR(" "), 0x80);
                         }
-
                         Notify(PSTR("\r\n"), 0x80);
 #endif
+
                         ParseHIDData(this, epInfo[index].epAddr, bHasReportId, (uint8_t)read, buf);
 
                         HIDReportParser *prs = GetReportParser(((bHasReportId) ? *buf : 0));
-
                         if(prs)
-                                prs->Parse(this, bHasReportId, (uint8_t)read, buf);
+                                prs->Parse(this, bHasReportId, (uint8_t)read, buf, bAddress, epInfo[index].epAddr);
                     }
 
         }

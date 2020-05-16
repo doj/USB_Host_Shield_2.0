@@ -386,8 +386,10 @@ uint8_t HIDUniversal::Poll() {
                 uint8_t buf[constBuffLen];
 
                 for(uint8_t i = 0; i < bNumIface; i++) {
-                        uint8_t index = hidInterfaces[i].epIndex[epInterruptInIndex];
+                        const uint8_t index = hidInterfaces[i].epIndex[epInterruptInIndex];
                         uint16_t read = (uint16_t)epInfo[index].maxPktSize;
+                        if(read > constBuffLen)
+                                read = constBuffLen;
 
                         memset(buf, 0, constBuffLen);
 
@@ -403,6 +405,8 @@ uint8_t HIDUniversal::Poll() {
                                 read = constBuffLen;
 
 #if HID_UNIVERSAL_REMOVE_IDENTICAL_BUFFER
+                        // \todo should we use the read variable, which could be less than the previously received message?
+                        //       or should we use constBuffLen?
                         const bool identical = memcmp(buf, prevBuf, read) == 0;
                         memcpy(prevBuf, buf, read);
                         if(identical)
@@ -426,7 +430,7 @@ uint8_t HIDUniversal::Poll() {
 
                         HIDReportParser *prs = GetReportParser(bHasReportId ? *buf : 0);
                         if(prs) {
-                                prs->Parse(this, bHasReportId, (uint8_t)read, buf);
+                                prs->Parse(this, bHasReportId, (uint8_t)read, buf, bAddress, epInfo[index].epAddr);
                         } else {
                                 USBTRACE3("!GetReportParser:",bHasReportId,0x80);
                         }

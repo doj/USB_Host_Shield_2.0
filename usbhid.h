@@ -144,8 +144,10 @@ public:
          * @param is_rpt_id should be true if the report parser has an ID, it seems this parameter is currently always false.
          * @param len length of @p buf in bytes.
          * @param buf data received from the HID device.
+         * @param bAddress USB address the data was received from.
+         * @param epAddress USB endpoint address the data was received from.
          */
-        virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf) = 0;
+        virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf, uint8_t bAddress, uint8_t epAddress) = 0;
 
         /// called when the USB device is released (disconnected).
         virtual void Release() {}
@@ -167,24 +169,18 @@ protected:
         void PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr);
         void PrintHidDescriptor(const USB_HID_DESCRIPTOR *pDesc);
 
-        // \todo should this be an abstract method?
-        virtual HIDReportParser* GetReportParser(uint8_t id __attribute__((unused))) {
-                return NULL;
-        }
+        virtual HIDReportParser* GetReportParser(uint8_t id) = 0;
 
 public:
 
         USBHID(USB *pusb) : pUsb(pusb) {
         }
 
-        const USB* GetUsb() {
+        USB* GetUsb() {
                 return pUsb;
         }
 
-        // \todo should this be an abstract method?
-        virtual bool SetReportParser(uint8_t id __attribute__((unused)), HIDReportParser *prs __attribute__((unused))) {
-                return false;
-        }
+        virtual bool SetReportParser(uint8_t id, HIDReportParser *prs) = 0;
 
         uint8_t SetProtocol(uint8_t iface, uint8_t protocol);
         uint8_t GetProtocol(uint8_t iface, uint8_t* dataptr);

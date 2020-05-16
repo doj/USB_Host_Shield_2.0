@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2013 Kristian Lauszus, TKJ Electronics. All rights reserved.
 
  This software may be distributed and modified under the terms of the GNU
@@ -192,12 +193,12 @@ void BTHID::ACLData(uint8_t* l2capinbuf) {
                                 switch(l2capinbuf[9]) {
                                         case 0x01: // Keyboard or Joystick events
                                                 if(pRptParser[KEYBOARD_PARSER_ID])
-                                                        pRptParser[KEYBOARD_PARSER_ID]->Parse(reinterpret_cast<USBHID *>(this), 0, (uint8_t)(length - 2), &l2capinbuf[10]); // Use reinterpret_cast again to extract the instance
+                                                        pRptParser[KEYBOARD_PARSER_ID]->Parse(reinterpret_cast<USBHID *>(this), 0, (uint8_t)(length - 2), &l2capinbuf[10], 0, 0); // Use reinterpret_cast again to extract the instance
                                                 break;
 
                                         case 0x02: // Mouse events
                                                 if(pRptParser[MOUSE_PARSER_ID])
-                                                        pRptParser[MOUSE_PARSER_ID]->Parse(reinterpret_cast<USBHID *>(this), 0, (uint8_t)(length - 2), &l2capinbuf[10]); // Use reinterpret_cast again to extract the instance
+                                                        pRptParser[MOUSE_PARSER_ID]->Parse(reinterpret_cast<USBHID *>(this), 0, (uint8_t)(length - 2), &l2capinbuf[10], 0, 0); // Use reinterpret_cast again to extract the instance
                                                 break;
 #ifdef EXTRADEBUG
                                         default:
