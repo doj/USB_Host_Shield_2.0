@@ -349,7 +349,8 @@ For instance if you have rerouted SS to pin 7 it should read:
 typedef MAX3421e<P7, P9> MAX3421E;
 ```
 
-See the "Interface modifications" section in the [hardware manual](https://chome.nerpa.tech/usb-host-shield-hardware-manual) for more information.
+See the "Interface modifications" section in the [hardware manual](https://github.com/doj/USB_Host_Shield_2.0/blob/master/doc/USBHostShieldHardwareManual.pdf)
+for more information.
 
 # FAQ
 
@@ -357,6 +358,7 @@ See the "Interface modifications" section in the [hardware manual](https://chome
 
 * Try to connect a external power supply to the Arduino - this solves the problem in most cases.
 * You can also use a powered hub between the device and the USB Host Shield. You should then include the USB hub library: ```#include <usbhub.h>``` and create the instance like so: ```USBHub Hub1(&Usb);```.
+* check that the solder pads marked 3.3V and 5V are closed.
 
 > When I connecting my PS3 controller I get a output like this:
 
