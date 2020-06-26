@@ -1,5 +1,3 @@
-*.pdf -text diff=astextplain
-
 # Auto detect text files and perform LF normalization
 * text=auto
 * text eol=lf
@@ -19,6 +17,7 @@
 *.DOCX diff=astextplain
 *.dot  diff=astextplain
 *.DOT  diff=astextplain
-*.PDF	 diff=astextplain
+*.pdf	binary diff=astextplain
+*.PDF	binary diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
