@@ -107,7 +107,7 @@ uint8_t USBHub::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // If device class is not a hub return
         if(udd->bDeviceClass != 0x09)
 	  {
-	    USBTRACE2("!dev ",(int)udd->bDeviceClass);
+	    USBTRACE2("nohub ",(int)udd->bDeviceClass);
                 return USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED;
 	  }
 

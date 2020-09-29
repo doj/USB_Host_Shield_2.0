@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -77,6 +78,14 @@ uint8_t USB::setEpInfoEntry(uint8_t addr, uint8_t epcount, EpInfo* eprecord_ptr)
         return 0;
 }
 
+/**
+ * @param[in] addr
+ * @param[in] ep
+ * @param[out] ppep pointer to a EpInfo pointer variable, which is set upon success return.
+ * @param[out] nak_limit pointer to a variable which gets the NAK limit value upon success return.
+ * @return 0 upon success.
+ * @return != 0 upon failure.
+ */
 uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_limit) {
         UsbDevice *p = addrPool.GetUsbDevicePtr(addr);
 
@@ -108,8 +117,6 @@ uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_l
         //Serial.println( mode, HEX);
         //Serial.print("\r\nLS: ");
         //Serial.println(p->lowspeed, HEX);
-
-
 
         // Set bmLOWSPEED and bmHUBPRE in case of low-speed device, reset them otherwise
         regWr(rMODE, (p->lowspeed) ? mode | bmLOWSPEED | bmHubPre : mode & ~(bmHUBPRE | bmLOWSPEED));
@@ -253,7 +260,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
                         continue;
                 }
                 if(rcode) {
-                        //printf(">>>>>>>> Problem! dispatchPkt %2.2x\r\n", rcode);
+                        //USBTRACE2("USB::InTransfer rcode ", (int)rcode);
                         break; //should be 0, indicating ACK. Else return error code.
                 }
                 /* check for RCVDAVIRQ and generate error if not present
@@ -404,63 +411,67 @@ breakout:
 
 /** dispatch USB packet.
  Assumes peripheral address is set and relevant buffer is loaded/empty.
- If NAK, tries to re-send up to nak_limit times.
+ If NAK, tries to re-send up to @p nak_limit times.
  If @p nak_limit == 0, do not count NAKs, exit after timeout.
  If bus timeout, re-sends up to USB_RETRY_LIMIT times.
- @return codes 0x00-0x0f are HRSLT( 0x00 being success ).
-@return 0xff means timeout.
+ @return 0 (hrSUCCESS) upon success.
+ @return 0x01-0x0f are HRSLT.
+ @return 0xff (USB_ERROR_TRANSFER_TIMEOUT) upon timeout.
 */
 uint8_t USB::dispatchPkt(uint8_t token, uint8_t ep, uint16_t nak_limit) {
-        uint32_t timeout = (uint32_t)millis() + USB_XFER_TIMEOUT;
-        uint8_t tmpdata;
-        uint8_t rcode = hrSUCCESS;
+        const uint32_t timeout = (uint32_t)millis() + USB_XFER_TIMEOUT;
+        uint8_t rcode = USB_ERROR_TRANSFER_TIMEOUT;
         uint8_t retry_count = 0;
         uint16_t nak_count = 0;
 
         while((int32_t)((uint32_t)millis() - timeout) < 0L) {
 #if defined(ESP8266) || defined(ESP32)
-                        yield(); // needed in order to reset the watchdog timer on the ESP8266
+                yield(); // needed in order to reset the watchdog timer on the ESP8266
 #endif
                 regWr(rHXFR, (token | ep)); //launch the transfer
-                rcode = USB_ERROR_TRANSFER_TIMEOUT;
 
                 while((int32_t)((uint32_t)millis() - timeout) < 0L) //wait for transfer completion
                 {
 #if defined(ESP8266) || defined(ESP32)
                         yield(); // needed in order to reset the watchdog timer on the ESP8266
 #endif
-                        tmpdata = regRd(rHIRQ);
+                        const uint8_t tmpdata = regRd(rHIRQ);
 
                         if(tmpdata & bmHXFRDNIRQ) {
                                 regWr(rHIRQ, bmHXFRDNIRQ); //clear the interrupt
-                                rcode = 0x00;
                                 break;
                         }//if( tmpdata & bmHXFRDNIRQ
 
                 }//while ( millis() < timeout
-
-                //if (rcode != 0x00) //exit if timeout
-                //        return ( rcode);
 
                 rcode = (regRd(rHRSL) & 0x0f); //analyze transfer result
 
                 switch(rcode) {
                         case hrNAK:
                                 nak_count++;
-                                if(nak_limit && (nak_count == nak_limit))
+                                if(nak_limit && (nak_count == nak_limit)) {
+                                        USBTRACE22("USB::dispatchPkt hrNAK ",(int)nak_count, (int)nak_limit);
                                         return (rcode);
+                                }
                                 break;
                         case hrTIMEOUT:
                                 retry_count++;
-                                if(retry_count == USB_RETRY_LIMIT)
+                                if(retry_count == USB_RETRY_LIMIT) {
+                                        USBTRACE22("USB::dispatchPkt hrTIMEOUT ",(int)retry_count, (int)USB_RETRY_LIMIT);
                                         return (rcode);
+                                }
                                 break;
+                        case hrSUCCESS:
+                                return rcode;
                         default:
+                                USBTRACE2("USB::dispatchPkt rcode ",(int)rcode);
                                 return (rcode);
                 }//switch( rcode
 
         }//while( timeout > millis()
-        return ( rcode);
+
+        USBTRACE2("USB::dispatchPkt return ",(int)rcode);
+        return (rcode);
 }
 
 /** USB main task. Performs enumeration/cleanup */

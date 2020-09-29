@@ -82,9 +82,41 @@ e-mail   :  support@circuitsathome.com
 /*
  * Debug macros: Strings are stored in progmem (flash) instead of RAM.
  */
-#define USBTRACE(s) (Notify(PSTR(s), 0x80))
-#define USBTRACE1(s,l) (Notify(PSTR(s), l))
-#define USBTRACE2(s,r) (Notify(PSTR(s), 0x80), D_PrintHex((r), 0x80), Notify(PSTR("\r\n"), 0x80))
-#define USBTRACE3(s,r,l) (Notify(PSTR(s), l), D_PrintHex((r), l), Notify(PSTR("\r\n"), l))
+
+/**
+ * print a debug message with the default level.
+ * @param s debug message C-string literal.
+ */
+#define USBTRACE(s) Notify(PSTR(s), 0x80)
+
+/**
+ * print a debug message with level @p l.
+ * @param s debug message C-string literal.
+ * @param l debug level.
+ */
+#define USBTRACE1(s,l) Notify(PSTR(s), l)
+
+/**
+ * print a debug message with the default level and a hex value.
+ * @param s debug message C-string literal.
+ * @param r hex value.
+ */
+#define USBTRACE2(s,r) do { Notify(PSTR(s), 0x80); D_PrintHex((r), 0x80); Notify(PSTR("\n"), 0x80); } while(0)
+
+/**
+ * print a debug message with the default level and two hex values.
+ * @param s debug message C-string literal.
+ * @param v1 hex value.
+ * @param v2 hex value.
+ */
+#define USBTRACE22(s,v1,v2) do { Notify(PSTR(s), 0x80); D_PrintHex((v1), 0x80); Notify(PSTR(" "), 0x80); D_PrintHex((v2), 0x80); Notify(PSTR("\n"), 0x80); } while(0)
+
+/**
+ * print a debug message with level @p l and a hex value.
+ * @param s debug message C-string literal.
+ * @param r hex value.
+ * @param l debug level.
+ */
+#define USBTRACE3(s,r,l) do { Notify(PSTR(s), l); D_PrintHex((r), l); Notify(PSTR("\n"), l); } while(0)
 
 #endif /* MACROS_H */

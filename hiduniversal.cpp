@@ -128,7 +128,7 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -178,7 +178,6 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         //delay(2); //per USB 2.0 sect.9.2.6.3
 
-	USBTRACE2("HIDUniversal ",(int)this);
         USBTRACE2("Addr:", bAddress);
 
         p->lowspeed = false;
@@ -248,7 +247,7 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                         goto FailSetIdle;
         }
 
-        USBTRACE("HU configured\r\n");
+        USBTRACE22("HU configured ", VID, PID);
 
         OnInitSuccessful();
 
@@ -308,7 +307,7 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
                 return;
 	  }
 
-        //ErrorMessage<uint8_t>(PSTR("\r\nConf.Val"), conf);
+        //ErrorMessage<uint8_t>(PSTR("\nConf.Val"), conf);
         //ErrorMessage<uint8_t>(PSTR("Iface Num"), iface);
         //ErrorMessage<uint8_t>(PSTR("Alt.Set"), alt);
 
@@ -325,11 +324,11 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
                 piface->bmProtocol = proto;
                 bNumIface++;
 		Notifyc(bNumIface+'0',0x80);
-		NotifyStr("piface\n",0x80);
+		NotifyStr(" new piface\n",0x80);
         }
 	else
 	  {
-	    NotifyStr("!piface",0x80);
+	    NotifyStr("use piface\n",0x80);
 	  }
 
         if((pep->bmAttributes & bmUSB_TRANSFER_TYPE) == USB_TRANSFER_TYPE_INTERRUPT)
@@ -353,7 +352,8 @@ void HIDUniversal::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint
         }
 	else
 	  {
-	    USBTRACE("EndpointXtract:i");
+	    NotifyStr("!index\n",0x80);
+	    //USBTRACE("EndpointXtract:i");
 	  }
         //PrintEndpointDescriptor(pep);
 }
@@ -377,11 +377,14 @@ uint8_t HIDUniversal::Release() {
 uint8_t HIDUniversal::Poll() {
         uint8_t rcode = 0;
 
-        if(!bPollEnable)
+        if(!bPollEnable) {
+                //USBTRACE("HIDUniversal::Poll() !bPollEnable\n");
                 return 0;
+        }
 
-        if((int32_t)((uint32_t)millis() - qNextPollTime) >= 0L) {
-                qNextPollTime = (uint32_t)millis() + pollInterval;
+        const uint32_t now = (uint32_t)millis();
+        if((int32_t)(now - qNextPollTime) >= 0L) {
+                qNextPollTime = now + pollInterval;
 
                 uint8_t buf[constBuffLen];
 
@@ -393,12 +396,14 @@ uint8_t HIDUniversal::Poll() {
 
                         memset(buf, 0, constBuffLen);
 
-                        uint8_t rcode = pUsb->inTransfer(bAddress, epInfo[index].epAddr, &read, buf);
-
+                        rcode = pUsb->inTransfer(bAddress, epInfo[index].epAddr, &read, buf);
                         if(rcode) {
-                                if(rcode != hrNAK)
-                                        USBTRACE3("(hiduniversal.h) Poll:", rcode, 0x81);
-                                return rcode;
+                                if(rcode != hrNAK) {
+                                        USBTRACE22("(hiduniversal.h) Poll:", rcode, hrNAK);
+                                }
+                                //USBTRACE2("HIDUniversal::Poll() rcode ", (int)rcode);
+                                //return rcode;
+                                continue;
                         }
 
                         if(read > constBuffLen)
@@ -409,8 +414,10 @@ uint8_t HIDUniversal::Poll() {
                         //       or should we use constBuffLen?
                         const bool identical = memcmp(buf, prevBuf, read) == 0;
                         memcpy(prevBuf, buf, read);
-                        if(identical)
+                        if(identical) {
+                                //USBTRACE2("HIDUniversal::Poll() identical", (int)bConfNum);
                                 return 0;
+                        }
 #endif
 
 #if defined(DEBUG_USB_HOST)
@@ -424,7 +431,7 @@ uint8_t HIDUniversal::Poll() {
                                 Notify(PSTR(" "), 0x80);
                         }
 
-                        Notify(PSTR("\r\n"), 0x80);
+                        Notify(PSTR("\n"), 0x80);
 #endif
                         ParseHIDData(this, bHasReportId, (uint8_t)read, buf);
 
@@ -432,7 +439,7 @@ uint8_t HIDUniversal::Poll() {
                         if(prs) {
                                 prs->Parse(this, bHasReportId, (uint8_t)read, buf, bAddress, epInfo[index].epAddr);
                         } else {
-                                USBTRACE3("!GetReportParser:",bHasReportId,0x80);
+                                USBTRACE2("!GetReportParser:",bHasReportId);
                         }
                 }
         }
