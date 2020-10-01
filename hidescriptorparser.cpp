@@ -1,3 +1,5 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
+
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -16,6 +18,40 @@ e-mail   :  support@circuitsathome.com
  */
 
 #include "hidescriptorparser.h"
+
+#undef USBTRACE
+#define USBTRACE(s) E_Notify(PSTR(s), 0x80)
+
+#undef USBTRACE1
+
+#undef USBTRACE2
+#define USBTRACE2(s,r) do { USBTRACE(s); PrintHex<decltype(r)>((r), 0x80); nl(); } while(0)
+
+#undef USBTRACE3
+
+static void
+nl()
+{
+        USBTRACE("\n");
+}
+
+static void
+PrintValue(const uint8_t *p, uint16_t len)
+{
+        USBTRACE(" (");
+        for(; len; p++, len--)
+                PrintHex<uint8_t >(*p, 0x80);
+        USBTRACE(")");
+}
+
+template<typename T>
+static void
+PrintValue(T data)
+{
+        USBTRACE(" (");
+        PrintHex<T>(data, 0x80);
+        USBTRACE(")");
+}
 
 const char * const ReportDescParserBase::usagePageTitles0[] PROGMEM = {
         pstrUsagePageGenericDesktopControls,
@@ -991,112 +1027,97 @@ const char * const ReportDescParserBase::medInstrTitles4[] PROGMEM = {
 };
 
 void ReportDescParserBase::Parse(const uint16_t len, const uint8_t *pbuf, const uint16_t &offset __attribute__((unused))) {
+#if 1
+        USBTRACE("\nDescriptor");
+        //PrintValue(len);
+        PrintValue(pbuf, len);
+        USBTRACE("\n");
+#endif
         uint16_t cntdn = (uint16_t)len;
         uint8_t *p = (uint8_t*)pbuf;
-
-
         totalSize = 0;
-
         while(cntdn) {
-                //USB_HOST_SERIAL.println("");
-                //PrintHex<uint16_t>(offset + len - cntdn);
-                //USB_HOST_SERIAL.print(":");
-
-                ParseItem(&p, &cntdn);
-
-                //if (ParseItem(&p, &cntdn))
-                //        return;
+                uint8_t err;
+                if ((err = ParseItem(&p, &cntdn))) {
+                        USBTRACE2("ParseItem failed:", err);
+                        break;
+                }
         }
-        //USBTRACE2("Total:", totalSize);
-}
-
-void ReportDescParserBase::PrintValue(uint8_t *p, uint8_t len) {
-        E_Notify(PSTR("("), 0x80);
-        for(; len; p++, len--)
-                PrintHex<uint8_t > (*p, 0x80);
-        E_Notify(PSTR(")"), 0x80);
-}
-
-void ReportDescParserBase::PrintByteValue(uint8_t data) {
-        E_Notify(PSTR("("), 0x80);
-        PrintHex<uint8_t > (data, 0x80);
-        E_Notify(PSTR(")"), 0x80);
+        USBTRACE2("totalSize:", totalSize);
 }
 
 void ReportDescParserBase::PrintItemTitle(uint8_t prefix) {
         switch(prefix & (TYPE_MASK | TAG_MASK)) {
                 case (TYPE_GLOBAL | TAG_GLOBAL_PUSH):
-                        E_Notify(PSTR("\r\nPush"), 0x80);
+                        USBTRACE("\nPush");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_POP):
-                        E_Notify(PSTR("\r\nPop"), 0x80);
+                        USBTRACE("\nPop");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_USAGEPAGE):
-                        E_Notify(PSTR("\r\nUsage Page"), 0x80);
+                        USBTRACE("\nUsage Page");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_LOGICALMIN):
-                        E_Notify(PSTR("\r\nLogical Min"), 0x80);
+                        USBTRACE("\nLogical Min");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_LOGICALMAX):
-                        E_Notify(PSTR("\r\nLogical Max"), 0x80);
+                        USBTRACE("\nLogical Max");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_PHYSMIN):
-                        E_Notify(PSTR("\r\nPhysical Min"), 0x80);
+                        USBTRACE("\nPhysical Min");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_PHYSMAX):
-                        E_Notify(PSTR("\r\nPhysical Max"), 0x80);
+                        USBTRACE("\nPhysical Max");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_UNITEXP):
-                        E_Notify(PSTR("\r\nUnit Exp"), 0x80);
+                        USBTRACE("\nUnit Exp");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_UNIT):
-                        E_Notify(PSTR("\r\nUnit"), 0x80);
+                        USBTRACE("\nUnit");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTSIZE):
-                        E_Notify(PSTR("\r\nReport Size"), 0x80);
+                        USBTRACE("\nReport Size");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTCOUNT):
-                        E_Notify(PSTR("\r\nReport Count"), 0x80);
+                        USBTRACE("\nReport Count");
                         break;
                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTID):
-                        E_Notify(PSTR("\r\nReport Id"), 0x80);
+                        USBTRACE("\nReport Id");
                         break;
                 case (TYPE_LOCAL | TAG_LOCAL_USAGE):
-                        E_Notify(PSTR("\r\nUsage"), 0x80);
+                        USBTRACE("\nUsage");
                         break;
                 case (TYPE_LOCAL | TAG_LOCAL_USAGEMIN):
-                        E_Notify(PSTR("\r\nUsage Min"), 0x80);
+                        USBTRACE("\nUsage Min");
                         break;
                 case (TYPE_LOCAL | TAG_LOCAL_USAGEMAX):
-                        E_Notify(PSTR("\r\nUsage Max"), 0x80);
+                        USBTRACE("\nUsage Max");
                         break;
                 case (TYPE_MAIN | TAG_MAIN_COLLECTION):
-                        E_Notify(PSTR("\r\nCollection"), 0x80);
+                        USBTRACE("\nCollection");
                         break;
                 case (TYPE_MAIN | TAG_MAIN_ENDCOLLECTION):
-                        E_Notify(PSTR("\r\nEnd Collection"), 0x80);
+                        USBTRACE("\nEnd Collection");
                         break;
                 case (TYPE_MAIN | TAG_MAIN_INPUT):
-                        E_Notify(PSTR("\r\nInput"), 0x80);
+                        USBTRACE("\nInput");
                         break;
                 case (TYPE_MAIN | TAG_MAIN_OUTPUT):
-                        E_Notify(PSTR("\r\nOutput"), 0x80);
+                        USBTRACE("\nOutput");
                         break;
                 case (TYPE_MAIN | TAG_MAIN_FEATURE):
-                        E_Notify(PSTR("\r\nFeature"), 0x80);
+                        USBTRACE("\nFeature");
                         break;
         } // switch (**pp & (TYPE_MASK | TAG_MASK))
 }
 
 uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
-        //uint8_t ret = enErrorSuccess;
-        //reinterpret_cast<>(varBuffer);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic warning "-Wimplicit-fallthrough=3"
         switch(itemParseState) {
                 case 0:
                         if(**pp == HID_LONG_ITEM_PREFIX)
-                                USBTRACE("\r\nLONG\r\n");
+                                USBTRACE("\nLONG\n");
                         else {
                                 uint8_t size = ((**pp) & DATA_SIZE_MASK);
 
@@ -1117,7 +1138,7 @@ uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                                 return enErrorIncomplete;
 			/* FALLTHRU */
                 case 1:
-                        //USBTRACE2("\r\niSz:",itemSize);
+                        //USBTRACE2("\niSz:",itemSize);
 
                         theBuffer.valueSize = itemSize;
                         valParser.Initialize(&theBuffer);
@@ -1125,7 +1146,7 @@ uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
 			/* FALLTHRU */
                 case 2:
                         if(!valParser.Parse(pp, pcntdn))
-                                return enErrorIncomplete;
+                                return enErrorParse;
                         itemParseState = 3;
 			/* FALLTHRU */
                 case 3:
@@ -1138,17 +1159,18 @@ uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                                                 if(theBuffer.valueSize > 1) {
                                                         uint16_t* ui16 = reinterpret_cast<uint16_t *>(varBuffer);
                                                         pfUsage(*ui16);
-                                                } else
+                                                } else {
                                                         pfUsage(data);
+						}
                                         }
                                         break;
                                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTSIZE):
                                         rptSize = data;
-                                        PrintByteValue(data);
+                                        PrintValue(data);
                                         break;
                                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTCOUNT):
                                         rptCount = data;
-                                        PrintByteValue(data);
+                                        PrintValue(data);
                                         break;
                                 case (TYPE_GLOBAL | TAG_GLOBAL_LOGICALMIN):
                                 case (TYPE_GLOBAL | TAG_GLOBAL_LOGICALMAX):
@@ -1167,36 +1189,36 @@ uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                                 case (TYPE_GLOBAL | TAG_GLOBAL_USAGEPAGE):
                                         SetUsagePage(data);
                                         PrintUsagePage(data);
-                                        PrintByteValue(data);
+                                        PrintValue(data);
                                         break;
                                 case (TYPE_MAIN | TAG_MAIN_COLLECTION):
                                 case (TYPE_MAIN | TAG_MAIN_ENDCOLLECTION):
                                         switch(data) {
                                                 case 0x00:
-                                                        E_Notify(PSTR(" Physical"), 0x80);
+                                                        USBTRACE(" Physical");
                                                         break;
                                                 case 0x01:
-                                                        E_Notify(PSTR(" Application"), 0x80);
+                                                        USBTRACE(" Application");
                                                         break;
                                                 case 0x02:
-                                                        E_Notify(PSTR(" Logical"), 0x80);
+                                                        USBTRACE(" Logical");
                                                         break;
                                                 case 0x03:
-                                                        E_Notify(PSTR(" Report"), 0x80);
+                                                        USBTRACE(" Report");
                                                         break;
                                                 case 0x04:
-                                                        E_Notify(PSTR(" Named Array"), 0x80);
+                                                        USBTRACE(" Named Array");
                                                         break;
                                                 case 0x05:
-                                                        E_Notify(PSTR(" Usage Switch"), 0x80);
+                                                        USBTRACE(" Usage Switch");
                                                         break;
                                                 case 0x06:
-                                                        E_Notify(PSTR(" Usage Modifier"), 0x80);
+                                                        USBTRACE(" Usage Modifier");
                                                         break;
                                                 default:
-                                                        E_Notify(PSTR(" Vendor Defined("), 0x80);
+                                                        USBTRACE(" Vendor Defined(");
                                                         PrintHex<uint8_t > (data, 0x80);
-                                                        E_Notify(PSTR(")"), 0x80);
+                                                        USBTRACE(")");
                                         }
                                         break;
                                 case (TYPE_MAIN | TAG_MAIN_INPUT):
@@ -1205,9 +1227,9 @@ uint8_t ReportDescParserBase::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                                         totalSize += (uint16_t)rptSize * (uint16_t)rptCount;
                                         rptSize = 0;
                                         rptCount = 0;
-                                        E_Notify(PSTR("("), 0x80);
+                                        USBTRACE("(");
                                         PrintBin<uint8_t > (data, 0x80);
-                                        E_Notify(PSTR(")"), 0x80);
+                                        USBTRACE(")");
                                         break;
                         } // switch (**pp & (TYPE_MASK | TAG_MASK))
                 }
@@ -1241,7 +1263,6 @@ void ReportDescParserBase::SetUsagePage(uint16_t page) {
 
         if(VALUE_BETWEEN(page, 0x00, 0x11)) {
                 pfUsage = (usagePageFunctions[page - 1]);
-
         } else {
                 switch(page) {
                         case 0x14:
@@ -1280,20 +1301,16 @@ void ReportDescParserBase::PrintUsagePage(uint16_t page) {
 }
 
 void ReportDescParserBase::PrintButtonPageUsage(uint16_t usage) {
-        E_Notify(pstrSpace, 0x80);
-        E_Notify(PSTR("Btn"), 0x80);
+        USBTRACE(" Btn ");
         PrintHex<uint16_t > (usage, 0x80);
-        E_Notify(PSTR("\r\n"), 0x80);
-        //USB_HOST_SERIAL.print(usage, HEX);
+        //nl();
 }
 
 void ReportDescParserBase::PrintOrdinalPageUsage(uint16_t usage) {
-        E_Notify(pstrSpace, 0x80);
-        E_Notify(PSTR("Inst"), 0x80);
+        USBTRACE(" Inst ");
         // Sorry, HEX for now...
         PrintHex<uint16_t > (usage, 0x80);
-        E_Notify(PSTR("\r\n"), 0x80);
-        //USB_HOST_SERIAL.print(usage, DEC);
+        nl();
 }
 
 void ReportDescParserBase::PrintGenericDesktopPageUsage(uint16_t usage) {
@@ -1433,13 +1450,12 @@ void ReportDescParserBase::PrintMedicalInstrumentPageUsage(uint16_t usage) {
 }
 
 uint8_t ReportDescParser2::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
-        //uint8_t ret = enErrorSuccess;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic warning "-Wimplicit-fallthrough=3"
         switch(itemParseState) {
                 case 0:
                         if(**pp == HID_LONG_ITEM_PREFIX)
-                                USBTRACE("\r\nLONG\r\n");
+                                USBTRACE("\nLONG\n");
                         else {
                                 uint8_t size = ((**pp) & DATA_SIZE_MASK);
                                 itemPrefix = (**pp);
@@ -1462,8 +1478,9 @@ uint8_t ReportDescParser2::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                         itemParseState = 2;
 			/* FALLTHRU */
                 case 2:
-                        if(!valParser.Parse(pp, pcntdn))
-                                return enErrorIncomplete;
+                        if(! valParser.Parse(pp, pcntdn)) {
+        			return enErrorParse;
+			}
                         itemParseState = 3;
 			/* FALLTHRU */
                 case 3:
@@ -1476,8 +1493,9 @@ uint8_t ReportDescParser2::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
                                                 if(theBuffer.valueSize > 1) {
                                                         uint16_t* ui16 = reinterpret_cast<uint16_t *>(varBuffer);
                                                         pfUsage(*ui16);
-                                                } else
+                                                } else {
                                                         pfUsage(data);
+						}
                                         }
                                         break;
                                 case (TYPE_GLOBAL | TAG_GLOBAL_REPORTSIZE):
@@ -1524,10 +1542,10 @@ uint8_t ReportDescParser2::ParseItem(uint8_t **pp, uint16_t *pcntdn) {
 }
 
 void ReportDescParser2::OnInputItem(uint8_t itm) {
-        uint8_t byte_offset = (totalSize >> 3); // calculate offset to the next unhandled byte i = (int)(totalCount / 8);
-        uint32_t tmp = (byte_offset << 3);
-        uint8_t bit_offset = totalSize - tmp; // number of bits in the current byte already handled
-        uint8_t *p = pBuf + byte_offset; // current byte pointer
+        const uint8_t byte_offset = (totalSize >> 3); // calculate offset to the next unhandled byte i = (int)(totalCount / 8);
+        const uint32_t tmp = (byte_offset << 3);
+        const uint8_t bit_offset = totalSize - tmp; // number of bits in the current byte already handled
+        uint8_t *p = const_cast<uint8_t*>(pBuf) + byte_offset; // current byte pointer
 
         if(bit_offset)
                 *p >>= bit_offset;
@@ -1550,8 +1568,9 @@ void ReportDescParser2::OnInputItem(uint8_t itm) {
                 result.dwResult = 0;
                 uint8_t mask = 0;
 
-                if(print_usemin_usemax)
+                if(print_usemin_usemax) {
                         pfUsage(usage);
+		}
 
                 // bits_left            - number of bits in the field(array of fields, depending on Report Count) left to process
                 // bits_of_byte         - number of bits in current byte left to process
@@ -1584,16 +1603,21 @@ void ReportDescParser2::OnInputItem(uint8_t itm) {
                                 p++;
                         }
                 }
-                PrintByteValue(result.dwResult);
+                PrintValue(result.dwResult);
         }
-        E_Notify(PSTR("\r\n"), 0x80);
+        nl();
 }
 
 void UniversalReportParser::Parse(USBHID *hid, bool is_rpt_id __attribute__((unused)), uint8_t len, uint8_t *buf) {
+#if 1
+        USBTRACE("\nParse2");
+        PrintValue(buf, len);
+        nl();
+#endif
+
         ReportDescParser2 prs(len, buf);
-
         uint8_t ret = hid->GetReportDescr(0, &prs);
-
-        if(ret)
-                ErrorMessage<uint8_t > (PSTR("GetReportDescr-2"), ret);
+        if(ret) {
+                USBTRACE2("!GetReportDescr ",ret);
+        }
 }

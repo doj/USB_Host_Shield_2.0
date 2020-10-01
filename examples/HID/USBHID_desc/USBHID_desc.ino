@@ -1,3 +1,5 @@
+// -*- c-basic-offset: 4; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
+
 #include <usbhid.h>
 #include <hiduniversal.h>
 #include <hidescriptorparser.h>
@@ -74,4 +76,3 @@ void loop()
 {
     Usb.Task();
 }
-
