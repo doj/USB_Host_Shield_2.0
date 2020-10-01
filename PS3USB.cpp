@@ -56,12 +56,12 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // get memory address of USB device address pool
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nPS3USB Init"), 0x80);
+        Notify(PSTR("\nPS3USB Init"), 0x80);
 #endif
         // check if address has already been assigned to an instance
         if(bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -71,14 +71,14 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -121,13 +121,13 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 addrPool.FreeAddress(bAddress);
                 bAddress = 0;
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 return rcode;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
         //delay(300); // Spec says you should wait at least 200ms
@@ -178,12 +178,12 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         if(PID == PS3_PID || PID == PS3NAVIGATION_PID) {
                 if(PID == PS3_PID) {
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nDualshock 3 Controller Connected"), 0x80);
+                        Notify(PSTR("\nDualshock 3 Controller Connected"), 0x80);
 #endif
                         PS3Connected = true;
                 } else { // must be a navigation controller
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nNavigation Controller Connected"), 0x80);
+                        Notify(PSTR("\nNavigation Controller Connected"), 0x80);
 #endif
                         PS3NavigationConnected = true;
                 }
@@ -197,7 +197,7 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                         readBuf[i] = 0x7F; // Set the analog joystick values to center position
         } else { // must be a Motion controller
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nMotion Controller Connected"), 0x80);
+                Notify(PSTR("\nMotion Controller Connected"), 0x80);
 #endif
                 PS3MoveConnected = true;
                 writeBuf[0] = 0x02; // Set report ID, this is needed for Move commands to work
@@ -209,7 +209,7 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                         setBdaddr(my_bdaddr); // Set internal Bluetooth address
 
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nBluetooth Address was set to: "), 0x80);
+                Notify(PSTR("\nBluetooth Address was set to: "), 0x80);
                 for(int8_t i = 5; i > 0; i--) {
                         D_PrintHex<uint8_t > (my_bdaddr[i], 0x80);
                         Notify(PSTR(":"), 0x80);
@@ -220,7 +220,7 @@ uint8_t PS3USB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         onInit();
 
         bPollEnable = true;
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
         timer = (uint32_t)millis();
         return 0; // Successful configuration
 
@@ -251,7 +251,7 @@ FailUnknownDevice:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nPS3 Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nPS3 Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -294,7 +294,7 @@ uint8_t PS3USB::Poll() {
 void PS3USB::readReport() {
         ButtonState = (uint32_t)(readBuf[2] | ((uint16_t)readBuf[3] << 8) | ((uint32_t)readBuf[4] << 16));
 
-        //Notify(PSTR("\r\nButtonState", 0x80);
+        //Notify(PSTR("\nButtonState", 0x80);
         //PrintHex<uint32_t>(ButtonState, 0x80);
 
         if(ButtonState != OldButtonState) {
@@ -309,7 +309,7 @@ void PS3USB::printReport() { // Uncomment "#define PRINTREPORT" to print the rep
                 D_PrintHex<uint8_t > (readBuf[i], 0x80);
                 Notify(PSTR(" "), 0x80);
         }
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 #endif
 }
 
@@ -364,7 +364,7 @@ bool PS3USB::getStatus(StatusEnum c) {
 void PS3USB::printStatusString() {
         char statusOutput[102]; // Max string length plus null character
         if(PS3Connected || PS3NavigationConnected) {
-                strcpy_P(statusOutput, PSTR("\r\nConnectionStatus: "));
+                strcpy_P(statusOutput, PSTR("\nConnectionStatus: "));
 
                 if(getStatus(Plugged)) strcat_P(statusOutput, PSTR("Plugged"));
                 else if(getStatus(Unplugged)) strcat_P(statusOutput, PSTR("Unplugged"));
@@ -389,7 +389,7 @@ void PS3USB::printStatusString() {
                 else if(getStatus(Bluetooth)) strcat_P(statusOutput, PSTR("Bluetooth - Rumble is off"));
                 else strcat_P(statusOutput, PSTR("Error"));
         } else
-                strcpy_P(statusOutput, PSTR("\r\nError"));
+                strcpy_P(statusOutput, PSTR("\nError"));
 
         USB_HOST_SERIAL.write(statusOutput);
 }
@@ -517,7 +517,7 @@ void PS3USB::moveSetBulb(ColorsEnum color) { // Use this to set the Color using 
 void PS3USB::moveSetRumble(uint8_t rumble) {
 #ifdef DEBUG_USB_HOST
         if(rumble < 64 && rumble != 0) // The rumble value has to at least 64, or approximately 25% (64/255*100)
-                Notify(PSTR("\r\nThe rumble value has to at least 64, or approximately 25%"), 0x80);
+                Notify(PSTR("\nThe rumble value has to at least 64, or approximately 25%"), 0x80);
 #endif
         writeBuf[6] = rumble; // Set the rumble value into the write buffer
 

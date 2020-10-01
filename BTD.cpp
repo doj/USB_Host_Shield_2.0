@@ -57,12 +57,12 @@ uint8_t BTD::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool(); // Get memory address of USB device address pool
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nBTD ConfigureDevice"), 0x80);
+        Notify(PSTR("\nBTD ConfigureDevice"), 0x80);
 #endif
 
         if(bAddress) { // Check if address has already been assigned to an instance
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -70,14 +70,14 @@ uint8_t BTD::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
         p = addrPool.GetUsbDevicePtr(0); // Get pointer to pseudo device with address 0 assigned
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -96,7 +96,7 @@ uint8_t BTD::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nOut of address space"), 0x80);
+                Notify(PSTR("\nOut of address space"), 0x80);
 #endif
                 return USB_ERROR_OUT_OF_ADDRESS_SPACE_IN_POOL;
         }
@@ -114,7 +114,7 @@ uint8_t BTD::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
 FailHub:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nPlease create a hub instance in your code: \"USBHub Hub1(&Usb);\""), 0x80);
+        Notify(PSTR("\nPlease create a hub instance in your code: \"USBHub Hub1(&Usb);\""), 0x80);
 #endif
         pUsb->setAddr(bAddress, 0, 0); // Reset address
         rcode = USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED;
@@ -138,13 +138,13 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nBTD Init"), 0x80);
+        Notify(PSTR("\nBTD Init"), 0x80);
 #endif
         UsbDevice *p = addrPool.GetUsbDevicePtr(bAddress); // Get pointer to assigned address record
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
@@ -154,14 +154,14 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
         rcode = pUsb->setAddr(0, 0, bAddress); // Assign new address to the device
         if(rcode) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 p->lowspeed = false;
                 goto Fail;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
 
@@ -170,7 +170,7 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
         p = addrPool.GetUsbDevicePtr(bAddress); // Get pointer to assigned address record
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
@@ -190,16 +190,16 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
 #ifdef DEBUG_USB_HOST
                 if(PID == PS3_PID || PID == PS3NAVIGATION_PID) {
                         if(PID == PS3_PID)
-                                Notify(PSTR("\r\nDualshock 3 Controller Connected"), 0x80);
+                                Notify(PSTR("\nDualshock 3 Controller Connected"), 0x80);
                         else // It must be a navigation controller
-                                Notify(PSTR("\r\nNavigation Controller Connected"), 0x80);
+                                Notify(PSTR("\nNavigation Controller Connected"), 0x80);
                 } else // It must be a Motion controller
-                        Notify(PSTR("\r\nMotion Controller Connected"), 0x80);
+                        Notify(PSTR("\nMotion Controller Connected"), 0x80);
 #endif
 
                 if(my_bdaddr[0] == 0x00 && my_bdaddr[1] == 0x00 && my_bdaddr[2] == 0x00 && my_bdaddr[3] == 0x00 && my_bdaddr[4] == 0x00 && my_bdaddr[5] == 0x00) {
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nPlease plug in the dongle before trying to pair with the PS3 Controller\r\nor set the Bluetooth address in the constructor of the PS3BT class"), 0x80);
+                        Notify(PSTR("\nPlease plug in the dongle before trying to pair with the PS3 Controller\nor set the Bluetooth address in the constructor of the PS3BT class"), 0x80);
 #endif
                 } else {
                         if(PID == PS3_PID || PID == PS3NAVIGATION_PID)
@@ -207,7 +207,7 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
                         else
                                 setMoveBdaddr(my_bdaddr); // Set internal Bluetooth address
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nBluetooth Address was set to: "), 0x80);
+                        Notify(PSTR("\nBluetooth Address was set to: "), 0x80);
                         for(int8_t i = 5; i > 0; i--) {
                                 D_PrintHex<uint8_t > (my_bdaddr[i], 0x80);
                                 Notify(PSTR(":"), 0x80);
@@ -258,7 +258,7 @@ uint8_t BTD::Init(uint8_t parent __attribute__((unused)), uint8_t port __attribu
                 bPollEnable = true;
 
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nBluetooth Dongle Initialized"), 0x80);
+                Notify(PSTR("\nBluetooth Dongle Initialized"), 0x80);
 #endif
         }
         return 0; // Successful configuration
@@ -290,7 +290,7 @@ FailUnknownDevice:
         rcode = USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED;
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nBTD Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nBTD Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -356,18 +356,18 @@ void BTD::EndpointXtract(uint8_t conf, uint8_t iface __attribute__((unused)), ui
 
 void BTD::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr __attribute__((unused))) {
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nEndpoint descriptor:"), 0x80);
-        Notify(PSTR("\r\nLength:\t\t"), 0x80);
+        Notify(PSTR("\nEndpoint descriptor:"), 0x80);
+        Notify(PSTR("\nLength:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bLength, 0x80);
-        Notify(PSTR("\r\nType:\t\t"), 0x80);
+        Notify(PSTR("\nType:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bDescriptorType, 0x80);
-        Notify(PSTR("\r\nAddress:\t"), 0x80);
+        Notify(PSTR("\nAddress:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bEndpointAddress, 0x80);
-        Notify(PSTR("\r\nAttributes:\t"), 0x80);
+        Notify(PSTR("\nAttributes:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bmAttributes, 0x80);
-        Notify(PSTR("\r\nMaxPktSize:\t"), 0x80);
+        Notify(PSTR("\nMaxPktSize:\t"), 0x80);
         D_PrintHex<uint16_t > (ep_ptr->wMaxPacketSize, 0x80);
-        Notify(PSTR("\r\nPoll Intrv:\t"), 0x80);
+        Notify(PSTR("\nPoll Intrv:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bInterval, 0x80);
 #endif
 }
@@ -420,7 +420,7 @@ void BTD::HCI_event_task() {
                         case EV_COMMAND_STATUS:
                                 if(hcibuf[2]) { // Show status on serial if not OK
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nHCI Command Failed: "), 0x80);
+                                        Notify(PSTR("\nHCI Command Failed: "), 0x80);
                                         D_PrintHex<uint8_t > (hcibuf[2], 0x80);
 #endif
                                 }
@@ -431,9 +431,9 @@ void BTD::HCI_event_task() {
                                         inquiry_counter = 0;
 #ifdef DEBUG_USB_HOST
                                         if(pairWithWii)
-                                                Notify(PSTR("\r\nCouldn't find Wiimote"), 0x80);
+                                                Notify(PSTR("\nCouldn't find Wiimote"), 0x80);
                                         else
-                                                Notify(PSTR("\r\nCouldn't find HID device"), 0x80);
+                                                Notify(PSTR("\nCouldn't find HID device"), 0x80);
 #endif
                                         connectToWii = false;
                                         pairWithWii = false;
@@ -447,7 +447,7 @@ void BTD::HCI_event_task() {
                         case EV_INQUIRY_RESULT:
                                 if(hcibuf[2]) { // Check that there is more than zero responses
 #ifdef EXTRADEBUG
-                                        Notify(PSTR("\r\nNumber of responses: "), 0x80);
+                                        Notify(PSTR("\nNumber of responses: "), 0x80);
                                         Notify(hcibuf[2], 0x80);
 #endif
                                         for(uint8_t i = 0; i < hcibuf[2]; i++) {
@@ -457,7 +457,7 @@ void BTD::HCI_event_task() {
                                                         classOfDevice[j] = hcibuf[j + 4 + offset];
 
 #ifdef EXTRADEBUG
-                                                Notify(PSTR("\r\nClass of device: "), 0x80);
+                                                Notify(PSTR("\nClass of device: "), 0x80);
                                                 D_PrintHex<uint8_t > (classOfDevice[2], 0x80);
                                                 Notify(PSTR(" "), 0x80);
                                                 D_PrintHex<uint8_t > (classOfDevice[1], 0x80);
@@ -476,11 +476,11 @@ void BTD::HCI_event_task() {
                                                 } else if(pairWithHIDDevice && (classOfDevice[1] & 0x05) && (classOfDevice[0] & 0xC8)) { // Check if it is a mouse, keyboard or a gamepad - see: http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html
 #ifdef DEBUG_USB_HOST
                                                         if(classOfDevice[0] & 0x80)
-                                                                Notify(PSTR("\r\nMouse found"), 0x80);
+                                                                Notify(PSTR("\nMouse found"), 0x80);
                                                         if(classOfDevice[0] & 0x40)
-                                                                Notify(PSTR("\r\nKeyboard found"), 0x80);
+                                                                Notify(PSTR("\nKeyboard found"), 0x80);
                                                         if(classOfDevice[0] & 0x08)
-                                                                Notify(PSTR("\r\nGamepad found"), 0x80);
+                                                                Notify(PSTR("\nGamepad found"), 0x80);
 #endif
 
                                                         for(uint8_t j = 0; j < 6; j++)
@@ -497,14 +497,14 @@ void BTD::HCI_event_task() {
                                 hci_set_flag(HCI_FLAG_CONNECT_EVENT);
                                 if(!hcibuf[2]) { // Check if connected OK
 #ifdef EXTRADEBUG
-                                        Notify(PSTR("\r\nConnection established"), 0x80);
+                                        Notify(PSTR("\nConnection established"), 0x80);
 #endif
                                         hci_handle = hcibuf[3] | ((hcibuf[4] & 0x0F) << 8); // Store the handle for the ACL connection
                                         hci_set_flag(HCI_FLAG_CONNECT_COMPLETE); // Set connection complete flag
                                 } else {
                                         hci_state = HCI_CHECK_DEVICE_SERVICE;
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nConnection Failed: "), 0x80);
+                                        Notify(PSTR("\nConnection Failed: "), 0x80);
                                         D_PrintHex<uint8_t > (hcibuf[2], 0x80);
 #endif
                                 }
@@ -539,17 +539,17 @@ void BTD::HCI_event_task() {
                                 if((classOfDevice[1] & 0x05) && (classOfDevice[0] & 0xC8)) { // Check if it is a mouse, keyboard or a gamepad
 #ifdef DEBUG_USB_HOST
                                         if(classOfDevice[0] & 0x80)
-                                                Notify(PSTR("\r\nMouse is connecting"), 0x80);
+                                                Notify(PSTR("\nMouse is connecting"), 0x80);
                                         if(classOfDevice[0] & 0x40)
-                                                Notify(PSTR("\r\nKeyboard is connecting"), 0x80);
+                                                Notify(PSTR("\nKeyboard is connecting"), 0x80);
                                         if(classOfDevice[0] & 0x08)
-                                                Notify(PSTR("\r\nGamepad is connecting"), 0x80);
+                                                Notify(PSTR("\nGamepad is connecting"), 0x80);
 #endif
                                         incomingHIDDevice = true;
                                 }
 
 #ifdef EXTRADEBUG
-                                Notify(PSTR("\r\nClass of device: "), 0x80);
+                                Notify(PSTR("\nClass of device: "), 0x80);
                                 D_PrintHex<uint8_t > (classOfDevice[2], 0x80);
                                 Notify(PSTR(" "), 0x80);
                                 D_PrintHex<uint8_t > (classOfDevice[1], 0x80);
@@ -562,18 +562,18 @@ void BTD::HCI_event_task() {
                         case EV_PIN_CODE_REQUEST:
                                 if(pairWithWii) {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nPairing with Wiimote"), 0x80);
+                                        Notify(PSTR("\nPairing with Wiimote"), 0x80);
 #endif
                                         hci_pin_code_request_reply();
                                 } else if(btdPin != NULL) {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nBluetooth pin is set too: "), 0x80);
+                                        Notify(PSTR("\nBluetooth pin is set too: "), 0x80);
                                         NotifyStr(btdPin, 0x80);
 #endif
                                         hci_pin_code_request_reply();
                                 } else {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nNo pin was set"), 0x80);
+                                        Notify(PSTR("\nNo pin was set"), 0x80);
 #endif
                                         hci_pin_code_negative_request_reply();
                                 }
@@ -581,7 +581,7 @@ void BTD::HCI_event_task() {
 
                         case EV_LINK_KEY_REQUEST:
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nReceived Key Request"), 0x80);
+                                Notify(PSTR("\nReceived Key Request"), 0x80);
 #endif
                                 hci_link_key_request_negative_reply();
                                 break;
@@ -590,18 +590,18 @@ void BTD::HCI_event_task() {
                                 if(!hcibuf[2]) { // Check if pairing was successful
                                         if(pairWithWii && !connectToWii) {
 #ifdef DEBUG_USB_HOST
-                                                Notify(PSTR("\r\nPairing successful with Wiimote"), 0x80);
+                                                Notify(PSTR("\nPairing successful with Wiimote"), 0x80);
 #endif
                                                 connectToWii = true; // Used to indicate to the Wii service, that it should connect to this device
                                         } else if(pairWithHIDDevice && !connectToHIDDevice) {
 #ifdef DEBUG_USB_HOST
-                                                Notify(PSTR("\r\nPairing successful with HID device"), 0x80);
+                                                Notify(PSTR("\nPairing successful with HID device"), 0x80);
 #endif
                                                 connectToHIDDevice = true; // Used to indicate to the BTHID service, that it should connect to this device
                                         }
                                 } else {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nPairing Failed: "), 0x80);
+                                        Notify(PSTR("\nPairing Failed: "), 0x80);
                                         D_PrintHex<uint8_t > (hcibuf[2], 0x80);
 #endif
                                         hci_disconnect(hci_handle);
@@ -624,7 +624,7 @@ void BTD::HCI_event_task() {
 #ifdef EXTRADEBUG
                         default:
                                 if(hcibuf[0] != 0x00) {
-                                        Notify(PSTR("\r\nUnmanaged HCI Event: "), 0x80);
+                                        Notify(PSTR("\nUnmanaged HCI Event: "), 0x80);
                                         D_PrintHex<uint8_t > (hcibuf[0], 0x80);
                                 }
                                 break;
@@ -633,7 +633,7 @@ void BTD::HCI_event_task() {
         }
 #ifdef EXTRADEBUG
         else {
-                Notify(PSTR("\r\nHCI event error: "), 0x80);
+                Notify(PSTR("\nHCI event error: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
         }
 #endif
@@ -656,7 +656,7 @@ void BTD::HCI_task() {
                         if(hci_check_flag(HCI_FLAG_CMD_COMPLETE)) {
                                 hci_counter = 0;
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHCI Reset complete"), 0x80);
+                                Notify(PSTR("\nHCI Reset complete"), 0x80);
 #endif
                                 hci_state = HCI_CLASS_STATE;
                                 hci_write_class_of_device();
@@ -665,7 +665,7 @@ void BTD::HCI_task() {
                                 if(hci_num_reset_loops > 2000)
                                         hci_num_reset_loops = 2000;
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nNo response to HCI Reset"), 0x80);
+                                Notify(PSTR("\nNo response to HCI Reset"), 0x80);
 #endif
                                 hci_state = HCI_INIT_STATE;
                                 hci_counter = 0;
@@ -675,7 +675,7 @@ void BTD::HCI_task() {
                 case HCI_CLASS_STATE:
                         if(hci_check_flag(HCI_FLAG_CMD_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nWrite class of device"), 0x80);
+                                Notify(PSTR("\nWrite class of device"), 0x80);
 #endif
                                 hci_state = HCI_BDADDR_STATE;
                                 hci_read_bdaddr();
@@ -685,7 +685,7 @@ void BTD::HCI_task() {
                 case HCI_BDADDR_STATE:
                         if(hci_check_flag(HCI_FLAG_READ_BDADDR)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nLocal Bluetooth Address: "), 0x80);
+                                Notify(PSTR("\nLocal Bluetooth Address: "), 0x80);
                                 for(int8_t i = 5; i > 0; i--) {
                                         D_PrintHex<uint8_t > (my_bdaddr[i], 0x80);
                                         Notify(PSTR(":"), 0x80);
@@ -710,7 +710,7 @@ void BTD::HCI_task() {
                 case HCI_SET_NAME_STATE:
                         if(hci_check_flag(HCI_FLAG_CMD_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nThe name is set to: "), 0x80);
+                                Notify(PSTR("\nThe name is set to: "), 0x80);
                                 NotifyStr(btdName, 0x80);
 #endif
                                 hci_state = HCI_CHECK_DEVICE_SERVICE;
@@ -721,9 +721,9 @@ void BTD::HCI_task() {
                         if(pairWithHIDDevice || pairWithWii) { // Check if it should try to connect to a Wiimote
 #ifdef DEBUG_USB_HOST
                                 if(pairWithWii)
-                                        Notify(PSTR("\r\nStarting inquiry\r\nPress 1 & 2 on the Wiimote\r\nOr press the SYNC button if you are using a Wii U Pro Controller or a Wii Balance Board"), 0x80);
+                                        Notify(PSTR("\nStarting inquiry\nPress 1 & 2 on the Wiimote\nOr press the SYNC button if you are using a Wii U Pro Controller or a Wii Balance Board"), 0x80);
                                 else
-                                        Notify(PSTR("\r\nPlease enable discovery of your device"), 0x80);
+                                        Notify(PSTR("\nPlease enable discovery of your device"), 0x80);
 #endif
                                 hci_inquiry();
                                 hci_state = HCI_INQUIRY_STATE;
@@ -736,17 +736,17 @@ void BTD::HCI_task() {
                                 hci_inquiry_cancel(); // Stop inquiry
 #ifdef DEBUG_USB_HOST
                                 if(pairWithWii)
-                                        Notify(PSTR("\r\nWiimote found"), 0x80);
+                                        Notify(PSTR("\nWiimote found"), 0x80);
                                 else
-                                        Notify(PSTR("\r\nHID device found"), 0x80);
+                                        Notify(PSTR("\nHID device found"), 0x80);
 
-                                Notify(PSTR("\r\nNow just create the instance like so:"), 0x80);
+                                Notify(PSTR("\nNow just create the instance like so:"), 0x80);
                                 if(pairWithWii)
-                                        Notify(PSTR("\r\nWII Wii(&Btd);"), 0x80);
+                                        Notify(PSTR("\nWII Wii(&Btd);"), 0x80);
                                 else
-                                        Notify(PSTR("\r\nBTHID bthid(&Btd);"), 0x80);
+                                        Notify(PSTR("\nBTHID bthid(&Btd);"), 0x80);
 
-                                Notify(PSTR("\r\nAnd then press any button on the "), 0x80);
+                                Notify(PSTR("\nAnd then press any button on the "), 0x80);
                                 if(pairWithWii)
                                         Notify(PSTR("Wiimote"), 0x80);
                                 else
@@ -764,9 +764,9 @@ void BTD::HCI_task() {
                         if(hci_check_flag(HCI_FLAG_CMD_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
                                 if(pairWithWii)
-                                        Notify(PSTR("\r\nConnecting to Wiimote"), 0x80);
+                                        Notify(PSTR("\nConnecting to Wiimote"), 0x80);
                                 else
-                                        Notify(PSTR("\r\nConnecting to HID device"), 0x80);
+                                        Notify(PSTR("\nConnecting to HID device"), 0x80);
 #endif
                                 checkRemoteName = false;
                                 hci_connect();
@@ -779,15 +779,15 @@ void BTD::HCI_task() {
                                 if(hci_check_flag(HCI_FLAG_CONNECT_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
                                         if(pairWithWii)
-                                                Notify(PSTR("\r\nConnected to Wiimote"), 0x80);
+                                                Notify(PSTR("\nConnected to Wiimote"), 0x80);
                                         else
-                                                Notify(PSTR("\r\nConnected to HID device"), 0x80);
+                                                Notify(PSTR("\nConnected to HID device"), 0x80);
 #endif
                                         hci_authentication_request(); // This will start the pairing with the Wiimote
                                         hci_state = HCI_SCANNING_STATE;
                                 } else {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nTrying to connect one more time..."), 0x80);
+                                        Notify(PSTR("\nTrying to connect one more time..."), 0x80);
 #endif
                                         hci_connect(); // Try to connect one more time
                                 }
@@ -797,7 +797,7 @@ void BTD::HCI_task() {
                 case HCI_SCANNING_STATE:
                         if(!connectToWii && !pairWithWii && !connectToHIDDevice && !pairWithHIDDevice) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nWait For Incoming Connection Request"), 0x80);
+                                Notify(PSTR("\nWait For Incoming Connection Request"), 0x80);
 #endif
                                 hci_write_scan_enable();
                                 waitingForConnection = true;
@@ -809,7 +809,7 @@ void BTD::HCI_task() {
                         if(hci_check_flag(HCI_FLAG_INCOMING_REQUEST)) {
                                 waitingForConnection = false;
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nIncoming Connection Request"), 0x80);
+                                Notify(PSTR("\nIncoming Connection Request"), 0x80);
 #endif
                                 hci_remote_name();
                                 hci_state = HCI_REMOTE_NAME_STATE;
@@ -820,7 +820,7 @@ void BTD::HCI_task() {
                 case HCI_REMOTE_NAME_STATE:
                         if(hci_check_flag(HCI_FLAG_REMOTE_NAME_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nRemote Name: "), 0x80);
+                                Notify(PSTR("\nRemote Name: "), 0x80);
                                 for(uint8_t i = 0; i < strlen(remote_name); i++)
                                         Notifyc(remote_name[i], 0x80);
 #endif
@@ -830,7 +830,7 @@ void BTD::HCI_task() {
                                         wiiUProController = false;
                                         pairWiiUsingSync = false;
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nWiimote is connecting"), 0x80);
+                                        Notify(PSTR("\nWiimote is connecting"), 0x80);
 #endif
                                         if(strncmp((const char*)remote_name, "Nintendo RVL-CNT-01-TR", 22) == 0) {
 #ifdef DEBUG_USB_HOST
@@ -851,7 +851,7 @@ void BTD::HCI_task() {
                                 }
                                 if(classOfDevice[2] == 0 && classOfDevice[1] == 0x25 && classOfDevice[0] == 0x08 && strncmp((const char*)remote_name, "Wireless Controller", 19) == 0) {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nPS4 controller is connecting"), 0x80);
+                                        Notify(PSTR("\nPS4 controller is connecting"), 0x80);
 #endif
                                         incomingPS4 = true;
                                 }
@@ -867,7 +867,7 @@ void BTD::HCI_task() {
                 case HCI_CONNECTED_STATE:
                         if(hci_check_flag(HCI_FLAG_CONNECT_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nConnected to Device: "), 0x80);
+                                Notify(PSTR("\nConnected to Device: "), 0x80);
                                 for(int8_t i = 5; i > 0; i--) {
                                         D_PrintHex<uint8_t > (disc_bdaddr[i], 0x80);
                                         Notify(PSTR(":"), 0x80);
@@ -898,7 +898,7 @@ void BTD::HCI_task() {
                 case HCI_DISCONNECT_STATE:
                         if(hci_check_flag(HCI_FLAG_DISCONNECT_COMPLETE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHCI Disconnected from Device"), 0x80);
+                                Notify(PSTR("\nHCI Disconnected from Device"), 0x80);
 #endif
                                 hci_event_flag = 0; // Clear all flags
 
@@ -932,7 +932,7 @@ void BTD::ACL_event_task() {
         }
 #ifdef EXTRADEBUG
         else if(rcode != hrNAK) {
-                Notify(PSTR("\r\nACL data in error: "), 0x80);
+                Notify(PSTR("\nACL data in error: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
         }
 #endif
@@ -1108,7 +1108,7 @@ void BTD::hci_pin_code_request_reply() {
                 hcibuf[9] = 6; // Pin length is the length of the Bluetooth address
                 if(pairWiiUsingSync) {
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nPairing with Wii controller via SYNC"), 0x80);
+                        Notify(PSTR("\nPairing with Wii controller via SYNC"), 0x80);
 #endif
                         for(uint8_t i = 0; i < 6; i++)
                                 hcibuf[10 + i] = my_bdaddr[i]; // The pin is the Bluetooth dongles Bluetooth address backwards
@@ -1234,7 +1234,7 @@ void BTD::L2CAP_Command(uint16_t handle, uint8_t* data, uint8_t nbytes, uint8_t 
         if(rcode) {
                 delay(100); // This small delay prevents it from overflowing if it fails
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nError sending L2CAP message: 0x"), 0x80);
+                Notify(PSTR("\nError sending L2CAP message: 0x"), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
                 Notify(PSTR(" - Channel ID: "), 0x80);
                 D_PrintHex<uint8_t > (channelHigh, 0x80);

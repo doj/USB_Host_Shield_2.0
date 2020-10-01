@@ -72,12 +72,12 @@ uint8_t XBOXOLD::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // get memory address of USB device address pool
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nXBOXUSB Init"), 0x80);
+        Notify(PSTR("\nXBOXUSB Init"), 0x80);
 #endif
         // check if address has already been assigned to an instance
         if(bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -87,14 +87,14 @@ uint8_t XBOXOLD::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -137,13 +137,13 @@ uint8_t XBOXOLD::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 addrPool.FreeAddress(bAddress);
                 bAddress = 0;
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 return rcode;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
         //delay(300); // Spec says you should wait at least 200ms
@@ -191,7 +191,7 @@ uint8_t XBOXOLD::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 goto FailSetConfDescr;
 
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox Controller Connected\r\n"), 0x80);
+        Notify(PSTR("\nXbox Controller Connected\n"), 0x80);
 #endif
         if(pFuncOnInit)
                 pFuncOnInit(); // Call the user function
@@ -226,7 +226,7 @@ FailUnknownDevice:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nXbox Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -265,7 +265,7 @@ void XBOXOLD::readReport() {
         hatValue[RightHatX] = (int16_t)(((uint16_t)readBuf[16] << 8) | readBuf[17]);
         hatValue[RightHatY] = (int16_t)(((uint16_t)readBuf[18] << 8) | readBuf[19]);
 
-        //Notify(PSTR("\r\nButtonState"), 0x80);
+        //Notify(PSTR("\nButtonState"), 0x80);
         //PrintHex<uint8_t>(ButtonState, 0x80);
 
         if(ButtonState != OldButtonState || memcmp(buttonValues, oldButtonValues, sizeof (buttonValues)) != 0) {
@@ -288,7 +288,7 @@ void XBOXOLD::printReport(uint16_t length __attribute__((unused))) { //Uncomment
                 D_PrintHex<uint8_t > (readBuf[i], 0x80);
                 Notify(PSTR(" "), 0x80);
         }
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 #endif
 }
 

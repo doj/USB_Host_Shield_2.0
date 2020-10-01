@@ -107,7 +107,7 @@ uint8_t HIDComposite::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("HU Init\r\n");
+        USBTRACE("HU Init\n");
 
         if(bAddress)
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
@@ -119,7 +119,7 @@ uint8_t HIDComposite::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -242,7 +242,7 @@ uint8_t HIDComposite::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                         goto FailSetIdle;
         }
 
-        USBTRACE("HU configured\r\n");
+        USBTRACE("HU configured\n");
 
         OnInitSuccessful();
 
@@ -296,7 +296,7 @@ HIDComposite::HIDInterface* HIDComposite::FindInterface(uint8_t iface, uint8_t a
 }
 
 void HIDComposite::EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint8_t proto, const USB_ENDPOINT_DESCRIPTOR *pep) {
-        //ErrorMessage<uint8_t>(PSTR("\r\nConf.Val"), conf);
+        //ErrorMessage<uint8_t>(PSTR("\nConf.Val"), conf);
         //ErrorMessage<uint8_t>(PSTR("Iface Num"), iface);
         //ErrorMessage<uint8_t>(PSTR("Alt.Set"), alt);
 
@@ -390,12 +390,12 @@ uint8_t HIDComposite::Poll() {
                                 read = constBuffLen;
 
 #if 0
-                        Notify(PSTR("\r\nBuf: "), 0x80);
+                        Notify(PSTR("\nBuf: "), 0x80);
                         for(uint8_t i = 0; i < read; i++) {
-                                D_PrintHex<uint8_t > (buf[i], 0x80);
+                                D_PrintHex<uint8_t>(buf[i], 0x80);
                                 Notify(PSTR(" "), 0x80);
                         }
-                        Notify(PSTR("\r\n"), 0x80);
+                        Notify(PSTR("\n"), 0x80);
 #endif
 
                         ParseHIDData(this, epInfo[index].epAddr, bHasReportId, (uint8_t)read, buf);

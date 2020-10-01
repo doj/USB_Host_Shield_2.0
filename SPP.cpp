@@ -100,7 +100,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                 if((l2capinbuf[6] | (l2capinbuf[7] << 8)) == 0x0001U) { // l2cap_control - Channel ID for ACL-U
                         if(l2capinbuf[8] == L2CAP_CMD_COMMAND_REJECT) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nL2CAP Command Rejected - Reason: "), 0x80);
+                                Notify(PSTR("\nL2CAP Command Rejected - Reason: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[13], 0x80);
                                 Notify(PSTR(" "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[12], 0x80);
@@ -115,7 +115,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
 #endif
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONNECTION_REQUEST) {
 #ifdef EXTRADEBUG
-                                Notify(PSTR("\r\nL2CAP Connection Request - PSM: "), 0x80);
+                                Notify(PSTR("\nL2CAP Connection Request - PSM: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[13], 0x80);
                                 Notify(PSTR(" "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[12], 0x80);
@@ -140,51 +140,51 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONFIG_RESPONSE) {
                                 if((l2capinbuf[16] | (l2capinbuf[17] << 8)) == 0x0000) { // Success
                                         if(l2capinbuf[12] == sdp_dcid[0] && l2capinbuf[13] == sdp_dcid[1]) {
-                                                //Notify(PSTR("\r\nSDP Configuration Complete"), 0x80);
+                                                //Notify(PSTR("\nSDP Configuration Complete"), 0x80);
                                                 l2cap_set_flag(L2CAP_FLAG_CONFIG_SDP_SUCCESS);
                                         } else if(l2capinbuf[12] == rfcomm_dcid[0] && l2capinbuf[13] == rfcomm_dcid[1]) {
-                                                //Notify(PSTR("\r\nRFCOMM Configuration Complete"), 0x80);
+                                                //Notify(PSTR("\nRFCOMM Configuration Complete"), 0x80);
                                                 l2cap_set_flag(L2CAP_FLAG_CONFIG_RFCOMM_SUCCESS);
                                         }
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONFIG_REQUEST) {
                                 if(l2capinbuf[12] == sdp_dcid[0] && l2capinbuf[13] == sdp_dcid[1]) {
-                                        //Notify(PSTR("\r\nSDP Configuration Request"), 0x80);
+                                        //Notify(PSTR("\nSDP Configuration Request"), 0x80);
                                         pBtd->l2cap_config_response(hci_handle, l2capinbuf[9], sdp_scid);
                                 } else if(l2capinbuf[12] == rfcomm_dcid[0] && l2capinbuf[13] == rfcomm_dcid[1]) {
-                                        //Notify(PSTR("\r\nRFCOMM Configuration Request"), 0x80);
+                                        //Notify(PSTR("\nRFCOMM Configuration Request"), 0x80);
                                         pBtd->l2cap_config_response(hci_handle, l2capinbuf[9], rfcomm_scid);
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_DISCONNECT_REQUEST) {
                                 if(l2capinbuf[12] == sdp_dcid[0] && l2capinbuf[13] == sdp_dcid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Request: SDP Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Request: SDP Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_SDP_REQUEST);
                                 } else if(l2capinbuf[12] == rfcomm_dcid[0] && l2capinbuf[13] == rfcomm_dcid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Request: RFCOMM Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Request: RFCOMM Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_RFCOMM_REQUEST);
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_DISCONNECT_RESPONSE) {
                                 if(l2capinbuf[12] == sdp_scid[0] && l2capinbuf[13] == sdp_scid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Response: SDP Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Response: SDP Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_RESPONSE);
                                 } else if(l2capinbuf[12] == rfcomm_scid[0] && l2capinbuf[13] == rfcomm_scid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Response: RFCOMM Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Response: RFCOMM Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_RESPONSE);
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_INFORMATION_REQUEST) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nInformation request"), 0x80);
+                                Notify(PSTR("\nInformation request"), 0x80);
 #endif
                                 identifier = l2capinbuf[9];
                                 pBtd->l2cap_information_response(hci_handle, identifier, l2capinbuf[12], l2capinbuf[13]);
                         }
 #ifdef EXTRADEBUG
                         else {
-                                Notify(PSTR("\r\nL2CAP Unknown Signaling Command: "), 0x80);
+                                Notify(PSTR("\nL2CAP Unknown Signaling Command: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[8], 0x80);
                         }
 #endif
@@ -209,7 +209,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                 } else
                                         serviceNotSupported(l2capinbuf[9], l2capinbuf[10]); // The service is not supported
 #ifdef EXTRADEBUG
-                                Notify(PSTR("\r\nUUID: "), 0x80);
+                                Notify(PSTR("\nUUID: "), 0x80);
                                 uint16_t uuid;
                                 if((l2capinbuf[16] << 8 | l2capinbuf[17]) == 0x0000) // Check if it's sending the UUID as a 128-bit UUID
                                         uuid = (l2capinbuf[18] << 8 | l2capinbuf[19]);
@@ -217,10 +217,10 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         uuid = (l2capinbuf[16] << 8 | l2capinbuf[17]);
                                 D_PrintHex<uint16_t > (uuid, 0x80);
 
-                                Notify(PSTR("\r\nLength: "), 0x80);
+                                Notify(PSTR("\nLength: "), 0x80);
                                 uint16_t length = l2capinbuf[11] << 8 | l2capinbuf[12];
                                 D_PrintHex<uint16_t > (length, 0x80);
-                                Notify(PSTR("\r\nData: "), 0x80);
+                                Notify(PSTR("\nData: "), 0x80);
                                 for(uint8_t i = 0; i < length; i++) {
                                         D_PrintHex<uint8_t > (l2capinbuf[13 + i], 0x80);
                                         Notify(PSTR(" "), 0x80);
@@ -229,7 +229,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                         }
 #ifdef EXTRADEBUG
                         else {
-                                Notify(PSTR("\r\nUnknown PDU: "), 0x80);
+                                Notify(PSTR("\nUnknown PDU: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[8], 0x80);
                         }
 #endif
@@ -244,7 +244,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                 rfcommChannelConnection = rfcommChannel;
 
 #ifdef EXTRADEBUG
-                        Notify(PSTR("\r\nRFCOMM Channel: "), 0x80);
+                        Notify(PSTR("\nRFCOMM Channel: "), 0x80);
                         D_PrintHex<uint8_t > (rfcommChannel >> 3, 0x80);
                         Notify(PSTR(" Direction: "), 0x80);
                         D_PrintHex<uint8_t > (rfcommDirection >> 2, 0x80);
@@ -257,7 +257,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
 #endif
                         if(rfcommChannelType == RFCOMM_DISC) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nReceived Disconnect RFCOMM Command on channel: "), 0x80);
+                                Notify(PSTR("\nReceived Disconnect RFCOMM Command on channel: "), 0x80);
                                 D_PrintHex<uint8_t > (rfcommChannel >> 3, 0x80);
 #endif
                                 connected = false;
@@ -273,7 +273,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                                 for(; i < length; i++) {
                                                         if(rfcommAvailable + i >= sizeof (rfcommDataBuffer)) {
 #ifdef DEBUG_USB_HOST
-                                                                Notify(PSTR("\r\nWarning: Buffer is full!"), 0x80);
+                                                                Notify(PSTR("\nWarning: Buffer is full!"), 0x80);
 #endif
                                                                 break;
                                                         }
@@ -281,7 +281,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                                 }
                                                 rfcommAvailable += i;
 #ifdef EXTRADEBUG
-                                                Notify(PSTR("\r\nRFCOMM Data Available: "), 0x80);
+                                                Notify(PSTR("\nRFCOMM Data Available: "), 0x80);
                                                 Notify(rfcommAvailable, 0x80);
                                                 if(offset) {
                                                         Notify(PSTR(" - Credit: 0x"), 0x80);
@@ -291,7 +291,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         }
 #ifdef DEBUG_USB_HOST
                                         else
-                                                Notify(PSTR("\r\nError in FCS checksum!"), 0x80);
+                                                Notify(PSTR("\nError in FCS checksum!"), 0x80);
 #endif
 #ifdef PRINTREPORT // Uncomment "#define PRINTREPORT" to print the report send to the Arduino via Bluetooth
                                         for(uint8_t i = 0; i < length; i++)
@@ -299,7 +299,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
 #endif
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_RPN_CMD) { // UIH Remote Port Negotiation Command
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nReceived UIH Remote Port Negotiation Command"), 0x80);
+                                        Notify(PSTR("\nReceived UIH Remote Port Negotiation Command"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_RPN_RSP; // Command
                                         rfcommbuf[1] = l2capinbuf[12]; // Length and shiftet like so: length << 1 | 1
@@ -314,7 +314,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         sendRfcomm(rfcommChannel, rfcommDirection, 0, RFCOMM_UIH, rfcommPfBit, rfcommbuf, 0x0A); // UIH Remote Port Negotiation Response
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_MSC_CMD) { // UIH Modem Status Command
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nSend UIH Modem Status Response"), 0x80);
+                                        Notify(PSTR("\nSend UIH Modem Status Response"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_MSC_RSP; // UIH Modem Status Response
                                         rfcommbuf[1] = 2 << 1 | 1; // Length and shiftet like so: length << 1 | 1
@@ -325,12 +325,12 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                         } else {
                                 if(rfcommChannelType == RFCOMM_SABM) { // SABM Command - this is sent twice: once for channel 0 and then for the channel to establish
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nReceived SABM Command"), 0x80);
+                                        Notify(PSTR("\nReceived SABM Command"), 0x80);
 #endif
                                         sendRfcomm(rfcommChannel, rfcommDirection, rfcommCommandResponse, RFCOMM_UA, rfcommPfBit, rfcommbuf, 0x00); // UA Command
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_PN_CMD) { // UIH Parameter Negotiation Command
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nReceived UIH Parameter Negotiation Command"), 0x80);
+                                        Notify(PSTR("\nReceived UIH Parameter Negotiation Command"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_PN_RSP; // UIH Parameter Negotiation Response
                                         rfcommbuf[1] = l2capinbuf[12]; // Length and shiftet like so: length << 1 | 1
@@ -345,7 +345,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         sendRfcomm(rfcommChannel, rfcommDirection, 0, RFCOMM_UIH, rfcommPfBit, rfcommbuf, 0x0A);
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_MSC_CMD) { // UIH Modem Status Command
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nSend UIH Modem Status Response"), 0x80);
+                                        Notify(PSTR("\nSend UIH Modem Status Response"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_MSC_RSP; // UIH Modem Status Response
                                         rfcommbuf[1] = 2 << 1 | 1; // Length and shiftet like so: length << 1 | 1
@@ -355,7 +355,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
 
                                         delay(1);
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nSend UIH Modem Status Command"), 0x80);
+                                        Notify(PSTR("\nSend UIH Modem Status Command"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_MSC_CMD; // UIH Modem Status Command
                                         rfcommbuf[1] = 2 << 1 | 1; // Length and shiftet like so: length << 1 | 1
@@ -366,7 +366,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_MSC_RSP) { // UIH Modem Status Response
                                         if(!creditSent) {
 #ifdef DEBUG_USB_HOST
-                                                Notify(PSTR("\r\nSend UIH Command with credit"), 0x80);
+                                                Notify(PSTR("\nSend UIH Command with credit"), 0x80);
 #endif
                                                 sendRfcommCredit(rfcommChannelConnection, rfcommDirection, 0, RFCOMM_UIH, 0x10, sizeof (rfcommDataBuffer)); // Send credit
                                                 creditSent = true;
@@ -375,11 +375,11 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         }
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[10] == 0x01) { // UIH Command with credit
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nReceived UIH Command with credit"), 0x80);
+                                        Notify(PSTR("\nReceived UIH Command with credit"), 0x80);
 #endif
                                 } else if(rfcommChannelType == RFCOMM_UIH && l2capinbuf[11] == BT_RFCOMM_RPN_CMD) { // UIH Remote Port Negotiation Command
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nReceived UIH Remote Port Negotiation Command"), 0x80);
+                                        Notify(PSTR("\nReceived UIH Remote Port Negotiation Command"), 0x80);
 #endif
                                         rfcommbuf[0] = BT_RFCOMM_RPN_RSP; // Command
                                         rfcommbuf[1] = l2capinbuf[12]; // Length and shiftet like so: length << 1 | 1
@@ -393,13 +393,13 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                                         rfcommbuf[9] = l2capinbuf[20]; // Number of Frames
                                         sendRfcomm(rfcommChannel, rfcommDirection, 0, RFCOMM_UIH, rfcommPfBit, rfcommbuf, 0x0A); // UIH Remote Port Negotiation Response
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nRFCOMM Connection is now established\r\n"), 0x80);
+                                        Notify(PSTR("\nRFCOMM Connection is now established\n"), 0x80);
 #endif
                                         onInit();
                                 }
 #ifdef EXTRADEBUG
                                 else if(rfcommChannelType != RFCOMM_DISC) {
-                                        Notify(PSTR("\r\nUnsupported RFCOMM Data - ChannelType: "), 0x80);
+                                        Notify(PSTR("\nUnsupported RFCOMM Data - ChannelType: "), 0x80);
                                         D_PrintHex<uint8_t > (rfcommChannelType, 0x80);
                                         Notify(PSTR(" Command: "), 0x80);
                                         D_PrintHex<uint8_t > (l2capinbuf[11], 0x80);
@@ -409,7 +409,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
                 }
 #ifdef EXTRADEBUG
                 else {
-                        Notify(PSTR("\r\nUnsupported L2CAP Data - Channel ID: "), 0x80);
+                        Notify(PSTR("\nUnsupported L2CAP Data - Channel ID: "), 0x80);
                         D_PrintHex<uint8_t > (l2capinbuf[7], 0x80);
                         Notify(PSTR(" "), 0x80);
                         D_PrintHex<uint8_t > (l2capinbuf[6], 0x80);
@@ -423,7 +423,7 @@ void SPP::ACLData(uint8_t* l2capinbuf) {
 void SPP::Run() {
         if(waitForLastCommand && (int32_t)((uint32_t)millis() - timer) > 100) { // We will only wait 100ms and see if the UIH Remote Port Negotiation Command is send, as some deviced don't send it
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nRFCOMM Connection is now established - Automatic\r\n"), 0x80);
+                Notify(PSTR("\nRFCOMM Connection is now established - Automatic\n"), 0x80);
 #endif
                 onInit();
         }
@@ -445,7 +445,7 @@ void SPP::SDP_task() {
                         if(l2cap_check_flag(L2CAP_FLAG_CONNECTION_SDP_REQUEST)) {
                                 l2cap_clear_flag(L2CAP_FLAG_CONNECTION_SDP_REQUEST); // Clear flag
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nSDP Incoming Connection Request"), 0x80);
+                                Notify(PSTR("\nSDP Incoming Connection Request"), 0x80);
 #endif
                                 pBtd->l2cap_connection_response(hci_handle, identifier, sdp_dcid, sdp_scid, PENDING);
                                 delay(1);
@@ -458,7 +458,7 @@ void SPP::SDP_task() {
                                 l2cap_clear_flag(L2CAP_FLAG_DISCONNECT_SDP_REQUEST); // Clear flag
                                 SDPConnected = false;
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nDisconnected SDP Channel"), 0x80);
+                                Notify(PSTR("\nDisconnected SDP Channel"), 0x80);
 #endif
                                 pBtd->l2cap_disconnection_response(hci_handle, identifier, sdp_dcid, sdp_scid);
                         }
@@ -467,7 +467,7 @@ void SPP::SDP_task() {
                         if(l2cap_check_flag(L2CAP_FLAG_CONFIG_SDP_SUCCESS)) {
                                 l2cap_clear_flag(L2CAP_FLAG_CONFIG_SDP_SUCCESS); // Clear flag
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nSDP Successfully Configured"), 0x80);
+                                Notify(PSTR("\nSDP Successfully Configured"), 0x80);
 #endif
                                 firstMessage = true; // Reset bool
                                 SDPConnected = true;
@@ -478,7 +478,7 @@ void SPP::SDP_task() {
                 case L2CAP_DISCONNECT_RESPONSE: // This is for both disconnection response from the RFCOMM and SDP channel if they were connected
                         if(l2cap_check_flag(L2CAP_FLAG_DISCONNECT_RESPONSE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nDisconnected L2CAP Connection"), 0x80);
+                                Notify(PSTR("\nDisconnected L2CAP Connection"), 0x80);
 #endif
                                 pBtd->hci_disconnect(hci_handle);
                                 hci_handle = -1; // Reset handle
@@ -494,7 +494,7 @@ void SPP::RFCOMM_task() {
                         if(l2cap_check_flag(L2CAP_FLAG_CONNECTION_RFCOMM_REQUEST)) {
                                 l2cap_clear_flag(L2CAP_FLAG_CONNECTION_RFCOMM_REQUEST); // Clear flag
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nRFCOMM Incoming Connection Request"), 0x80);
+                                Notify(PSTR("\nRFCOMM Incoming Connection Request"), 0x80);
 #endif
                                 pBtd->l2cap_connection_response(hci_handle, identifier, rfcomm_dcid, rfcomm_scid, PENDING);
                                 delay(1);
@@ -508,7 +508,7 @@ void SPP::RFCOMM_task() {
                                 RFCOMMConnected = false;
                                 connected = false;
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nDisconnected RFCOMM Channel"), 0x80);
+                                Notify(PSTR("\nDisconnected RFCOMM Channel"), 0x80);
 #endif
                                 pBtd->l2cap_disconnection_response(hci_handle, identifier, rfcomm_dcid, rfcomm_scid);
                         }
@@ -517,7 +517,7 @@ void SPP::RFCOMM_task() {
                         if(l2cap_check_flag(L2CAP_FLAG_CONFIG_RFCOMM_SUCCESS)) {
                                 l2cap_clear_flag(L2CAP_FLAG_CONFIG_RFCOMM_SUCCESS); // Clear flag
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nRFCOMM Successfully Configured"), 0x80);
+                                Notify(PSTR("\nRFCOMM Successfully Configured"), 0x80);
 #endif
                                 rfcommAvailable = 0; // Reset number of bytes available
                                 bytesRead = 0; // Reset number of bytes received
@@ -820,7 +820,7 @@ int SPP::read(void) {
                 bytesRead = 0;
                 sendRfcommCredit(rfcommChannelConnection, rfcommDirection, 0, RFCOMM_UIH, 0x10, sizeof (rfcommDataBuffer)); // Send more credit
 #ifdef EXTRADEBUG
-                Notify(PSTR("\r\nSent "), 0x80);
+                Notify(PSTR("\nSent "), 0x80);
                 Notify((uint8_t)sizeof (rfcommDataBuffer), 0x80);
                 Notify(PSTR(" more credit"), 0x80);
 #endif

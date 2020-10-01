@@ -55,12 +55,12 @@ uint8_t XBOXONE::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // get memory address of USB device address pool
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nXBOXONE Init"), 0x80);
+        Notify(PSTR("\nXBOXONE Init"), 0x80);
 #endif
         // check if address has already been assigned to an instance
         if(bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -70,14 +70,14 @@ uint8_t XBOXONE::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -120,13 +120,13 @@ uint8_t XBOXONE::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 addrPool.FreeAddress(bAddress);
                 bAddress = 0;
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 return rcode;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
         //delay(300); // Spec says you should wait at least 200ms
@@ -173,7 +173,7 @@ uint8_t XBOXONE::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 goto FailSetConfDescr;
 
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox One Controller Connected\r\n"), 0x80);
+        Notify(PSTR("\nXbox One Controller Connected\n"), 0x80);
 #endif
 
         delay(200); // let things settle
@@ -228,7 +228,7 @@ FailUnknownDevice:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox One Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nXbox One Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -268,18 +268,18 @@ void XBOXONE::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr)
 {
   (void)ep_ptr;
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nEndpoint descriptor:"), 0x80);
-        Notify(PSTR("\r\nLength:\t\t"), 0x80);
+        Notify(PSTR("\nEndpoint descriptor:"), 0x80);
+        Notify(PSTR("\nLength:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bLength, 0x80);
-        Notify(PSTR("\r\nType:\t\t"), 0x80);
+        Notify(PSTR("\nType:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bDescriptorType, 0x80);
-        Notify(PSTR("\r\nAddress:\t"), 0x80);
+        Notify(PSTR("\nAddress:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bEndpointAddress, 0x80);
-        Notify(PSTR("\r\nAttributes:\t"), 0x80);
+        Notify(PSTR("\nAttributes:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bmAttributes, 0x80);
-        Notify(PSTR("\r\nMaxPktSize:\t"), 0x80);
+        Notify(PSTR("\nMaxPktSize:\t"), 0x80);
         D_PrintHex<uint16_t > (ep_ptr->wMaxPacketSize, 0x80);
-        Notify(PSTR("\r\nPoll Intrv:\t"), 0x80);
+        Notify(PSTR("\nPoll Intrv:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bInterval, 0x80);
 #endif
 }
@@ -294,7 +294,7 @@ uint8_t XBOXONE::Release() {
         pollInterval = 0;
         bPollEnable = false;
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox One Controller Disconnected\r\n"), 0x80);
+        Notify(PSTR("\nXbox One Controller Disconnected\n"), 0x80);
 #endif
         return 0;
 }
@@ -316,12 +316,12 @@ uint8_t XBOXONE::Poll() {
                                 D_PrintHex<uint8_t > (readBuf[i], 0x80);
                                 Notify(PSTR(" "), 0x80);
                         }
-                        Notify(PSTR("\r\n"), 0x80);
+                        Notify(PSTR("\n"), 0x80);
 #endif
                 }
 #ifdef DEBUG_USB_HOST
                 else if(rcode != hrNAK) { // Not a matter of no update to send
-                        Notify(PSTR("\r\nXbox One Poll Failed, error code: "), 0x80);
+                        Notify(PSTR("\nXbox One Poll Failed, error code: "), 0x80);
                         NotifyFail(rcode);
                 }
 #endif
@@ -344,7 +344,7 @@ void XBOXONE::readReport() {
         }
         if(readBuf[0] != 0x20) { // Check if it's the correct report, otherwise return - the controller also sends different status reports
 #ifdef EXTRADEBUG
-                Notify(PSTR("\r\nXbox Poll: "), 0x80);
+                Notify(PSTR("\nXbox Poll: "), 0x80);
                 D_PrintHex<uint8_t > (readBuf[0], 0x80); // 0x03 is a heart beat report!
 #endif
                 return;
@@ -362,7 +362,7 @@ void XBOXONE::readReport() {
         hatValue[RightHatX] = (int16_t)(((uint16_t)readBuf[15] << 8) | readBuf[14]);
         hatValue[RightHatY] = (int16_t)(((uint16_t)readBuf[17] << 8) | readBuf[16]);
 
-        //Notify(PSTR("\r\nButtonState"), 0x80);
+        //Notify(PSTR("\nButtonState"), 0x80);
         //PrintHex<uint16_t>(ButtonState, 0x80);
 
         if(ButtonState != OldButtonState) {
@@ -416,7 +416,7 @@ uint8_t XBOXONE::XboxCommand(uint8_t* data, uint16_t nbytes) {
         data[2] = cmdCounter++; // Increment the output command counter
         uint8_t rcode = pUsb->outTransfer(bAddress, epInfo[ XBOX_ONE_OUTPUT_PIPE ].epAddr, nbytes, data);
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXboxCommand, Return: "), 0x80);
+        Notify(PSTR("\nXboxCommand, Return: "), 0x80);
         D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
         return rcode;

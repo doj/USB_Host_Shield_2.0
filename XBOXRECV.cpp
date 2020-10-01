@@ -49,12 +49,12 @@ uint8_t XBOXRECV::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool(); // Get memory address of USB device address pool
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nXBOXRECV Init"), 0x80);
+        Notify(PSTR("\nXBOXRECV Init"), 0x80);
 #endif
 
         if(bAddress) { // Check if address has already been assigned to an instance
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -63,14 +63,14 @@ uint8_t XBOXRECV::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -91,7 +91,7 @@ uint8_t XBOXRECV::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if((VID != XBOX_VID && VID != MADCATZ_VID && VID != JOYTECH_VID) || (PID != XBOX_WIRELESS_RECEIVER_PID && PID != XBOX_WIRELESS_RECEIVER_THIRD_PARTY_PID)) { // Check if it's a Xbox receiver using the Vendor ID and Product ID
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nYou'll need a wireless receiver for this libary to work"), 0x80);
+                Notify(PSTR("\nYou'll need a wireless receiver for this libary to work"), 0x80);
 #endif
                 goto FailUnknownDevice;
         }
@@ -100,7 +100,7 @@ uint8_t XBOXRECV::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nOut of address space"), 0x80);
+                Notify(PSTR("\nOut of address space"), 0x80);
 #endif
                 return USB_ERROR_OUT_OF_ADDRESS_SPACE_IN_POOL;
         }
@@ -128,7 +128,7 @@ FailUnknownDevice:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox 360 Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nXbox 360 Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -140,13 +140,13 @@ uint8_t XBOXRECV::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nBTD Init"), 0x80);
+        Notify(PSTR("\nBTD Init"), 0x80);
 #endif
         UsbDevice *p = addrPool.GetUsbDevicePtr(bAddress); // Get pointer to assigned address record
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
@@ -156,14 +156,14 @@ uint8_t XBOXRECV::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
         rcode = pUsb->setAddr(0, 0, bAddress); // Assign new address to the device
         if(rcode) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 p->lowspeed = false;
                 goto Fail;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
 
@@ -172,7 +172,7 @@ uint8_t XBOXRECV::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
         p = addrPool.GetUsbDevicePtr(bAddress); // Get pointer to assigned address record
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
@@ -251,7 +251,7 @@ uint8_t XBOXRECV::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
                 goto FailSetConfDescr;
 
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox Wireless Receiver Connected\r\n"), 0x80);
+        Notify(PSTR("\nXbox Wireless Receiver Connected\n"), 0x80);
 #endif
         XboxReceiverConnected = true;
         bPollEnable = true;
@@ -272,7 +272,7 @@ FailSetConfDescr:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox 360 Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nXbox 360 Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -316,7 +316,7 @@ uint8_t XBOXRECV::Poll() {
 #ifdef EXTRADEBUG
                         Notify(PSTR("Bytes Received: "), 0x80);
                         D_PrintHex<uint16_t > (bufferSize, 0x80);
-                        Notify(PSTR("\r\n"), 0x80);
+                        Notify(PSTR("\n"), 0x80);
 #endif
                         readReport(i);
 #ifdef PRINTREPORT
@@ -341,11 +341,11 @@ void XBOXRECV::readReport(uint8_t controller) {
 #ifdef DEBUG_USB_HOST
                         const char* str = 0;
                         switch(readBuf[1]) {
-                                case 0x80: str = PSTR(" as controller\r\n");
+                                case 0x80: str = PSTR(" as controller\n");
                                         break;
-                                case 0x40: str = PSTR(" as headset\r\n");
+                                case 0x40: str = PSTR(" as headset\n");
                                         break;
-                                case 0xC0: str = PSTR(" as controller+headset\r\n");
+                                case 0xC0: str = PSTR(" as controller+headset\n");
                                         break;
                         }
                         Notify(PSTR(": connected"), 0x80);
@@ -355,7 +355,7 @@ void XBOXRECV::readReport(uint8_t controller) {
                 }
 #ifdef DEBUG_USB_HOST
                 else
-                        Notify(PSTR(": disconnected\r\n"), 0x80);
+                        Notify(PSTR(": disconnected\n"), 0x80);
 #endif
                 return;
         }
@@ -378,7 +378,7 @@ void XBOXRECV::readReport(uint8_t controller) {
         hatValue[controller][RightHatX] = (int16_t)(((uint16_t)readBuf[15] << 8) | readBuf[14]);
         hatValue[controller][RightHatY] = (int16_t)(((uint16_t)readBuf[17] << 8) | readBuf[16]);
 
-        //Notify(PSTR("\r\nButtonState: "), 0x80);
+        //Notify(PSTR("\nButtonState: "), 0x80);
         //PrintHex<uint32_t>(ButtonState[controller], 0x80);
 
         if(ButtonState[controller] != OldButtonState[controller]) {
@@ -403,7 +403,7 @@ void XBOXRECV::printReport(uint8_t controller __attribute__((unused)), uint8_t n
                 D_PrintHex<uint8_t > (readBuf[i], 0x80);
                 Notify(PSTR(" "), 0x80);
         }
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 #endif
 }
 
@@ -491,7 +491,7 @@ void XBOXRECV::XboxCommand(uint8_t controller, uint8_t* data, uint16_t nbytes) {
                 pUsb->outTransfer(bAddress, epInfo[ outputPipe ].epAddr, nbytes, data);
 #ifdef EXTRADEBUG
         if(rcode)
-                Notify(PSTR("Error sending Xbox message\r\n"), 0x80);
+                Notify(PSTR("Error sending Xbox message\n"), 0x80);
 #endif
 }
 

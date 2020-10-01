@@ -36,7 +36,7 @@ uint8_t PL2303::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("PL Init\r\n");
+        USBTRACE("PL Init\n");
 
         if(bAddress)
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
@@ -48,7 +48,7 @@ uint8_t PL2303::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -187,7 +187,7 @@ uint8_t PL2303::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         if(rcode)
                 goto FailOnInit;
 
-        USBTRACE("PL configured\r\n");
+        USBTRACE("PL configured\n");
 
         //bPollEnable = true;
         ready = true;

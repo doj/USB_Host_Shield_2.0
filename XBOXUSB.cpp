@@ -48,12 +48,12 @@ uint8_t XBOXUSB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // get memory address of USB device address pool
         AddressPool &addrPool = pUsb->GetAddressPool();
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nXBOXUSB Init"), 0x80);
+        Notify(PSTR("\nXBOXUSB Init"), 0x80);
 #endif
         // check if address has already been assigned to an instance
         if(bAddress) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress in use"), 0x80);
+                Notify(PSTR("\nAddress in use"), 0x80);
 #endif
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
@@ -63,14 +63,14 @@ uint8_t XBOXUSB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         if(!p) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nAddress not found"), 0x80);
+                Notify(PSTR("\nAddress not found"), 0x80);
 #endif
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nepinfo is null"), 0x80);
+                Notify(PSTR("\nepinfo is null"), 0x80);
 #endif
                 return USB_ERROR_EPINFO_IS_NULL;
         }
@@ -98,12 +98,12 @@ uint8_t XBOXUSB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 goto FailUnknownDevice;
         if(PID == XBOX_WIRELESS_PID) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nYou have plugged in a wireless Xbox 360 controller - it doesn't support USB communication"), 0x80);
+                Notify(PSTR("\nYou have plugged in a wireless Xbox 360 controller - it doesn't support USB communication"), 0x80);
 #endif
                 goto FailUnknownDevice;
         } else if(PID == XBOX_WIRELESS_RECEIVER_PID || PID == XBOX_WIRELESS_RECEIVER_THIRD_PARTY_PID) {
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nThis library only supports Xbox 360 controllers via USB"), 0x80);
+                Notify(PSTR("\nThis library only supports Xbox 360 controllers via USB"), 0x80);
 #endif
                 goto FailUnknownDevice;
         } else if(PID != XBOX_WIRED_PID && PID != MADCATZ_WIRED_PID && PID != GAMESTOP_WIRED_PID && PID != AFTERGLOW_WIRED_PID && PID != JOYTECH_WIRED_PID) // Check PID
@@ -125,13 +125,13 @@ uint8_t XBOXUSB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 addrPool.FreeAddress(bAddress);
                 bAddress = 0;
 #ifdef DEBUG_USB_HOST
-                Notify(PSTR("\r\nsetAddr: "), 0x80);
+                Notify(PSTR("\nsetAddr: "), 0x80);
                 D_PrintHex<uint8_t > (rcode, 0x80);
 #endif
                 return rcode;
         }
 #ifdef EXTRADEBUG
-        Notify(PSTR("\r\nAddr: "), 0x80);
+        Notify(PSTR("\nAddr: "), 0x80);
         D_PrintHex<uint8_t > (bAddress, 0x80);
 #endif
         //delay(300); // Spec says you should wait at least 200ms
@@ -179,7 +179,7 @@ uint8_t XBOXUSB::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 goto FailSetConfDescr;
 
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox 360 Controller Connected\r\n"), 0x80);
+        Notify(PSTR("\nXbox 360 Controller Connected\n"), 0x80);
 #endif
         onInit();
         Xbox360Connected = true;
@@ -213,7 +213,7 @@ FailUnknownDevice:
 
 Fail:
 #ifdef DEBUG_USB_HOST
-        Notify(PSTR("\r\nXbox 360 Init Failed, error code: "), 0x80);
+        Notify(PSTR("\nXbox 360 Init Failed, error code: "), 0x80);
         NotifyFail(rcode);
 #endif
         Release();
@@ -255,7 +255,7 @@ void XBOXUSB::readReport() {
         hatValue[RightHatX] = (int16_t)(((uint16_t)readBuf[11] << 8) | readBuf[10]);
         hatValue[RightHatY] = (int16_t)(((uint16_t)readBuf[13] << 8) | readBuf[12]);
 
-        //Notify(PSTR("\r\nButtonState"), 0x80);
+        //Notify(PSTR("\nButtonState"), 0x80);
         //PrintHex<uint32_t>(ButtonState, 0x80);
 
         if(ButtonState != OldButtonState) {
@@ -276,7 +276,7 @@ void XBOXUSB::printReport() { //Uncomment "#define PRINTREPORT" to print the rep
                 D_PrintHex<uint8_t > (readBuf[i], 0x80);
                 Notify(PSTR(" "), 0x80);
         }
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 #endif
 }
 

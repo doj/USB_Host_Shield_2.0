@@ -304,7 +304,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("BM Init\r\n");
+        USBTRACE("BM Init\n");
         //USBTRACE2("totalEndpoints:", (uint8_t) (totalEndpoints(BOOT_PROTOCOL)));
         //USBTRACE2("epMUL:", epMUL(BOOT_PROTOCOL));
 
@@ -319,7 +319,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -389,7 +389,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
 
         // GCC will optimize unused stuff away.
         if((BOOT_PROTOCOL & (USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE)) == (USB_HID_PROTOCOL_KEYBOARD | USB_HID_PROTOCOL_MOUSE)) {
-                USBTRACE("HID_PROTOCOL_KEYBOARD AND MOUSE\r\n");
+                USBTRACE("HID_PROTOCOL_KEYBOARD AND MOUSE\n");
                 ConfigDescParser<
                         USB_CLASS_HID,
                         HID_BOOT_INTF_SUBCLASS,
@@ -404,7 +404,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
         } else {
                 // GCC will optimize unused stuff away.
                 if(BOOT_PROTOCOL & USB_HID_PROTOCOL_KEYBOARD) {
-                        USBTRACE("HID_PROTOCOL_KEYBOARD\r\n");
+                        USBTRACE("HID_PROTOCOL_KEYBOARD\n");
                         for(uint8_t i = 0; i < num_of_conf; i++) {
                                 ConfigDescParser<
                                         USB_CLASS_HID,
@@ -420,7 +420,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
 
                 // GCC will optimize unused stuff away.
                 if(BOOT_PROTOCOL & USB_HID_PROTOCOL_MOUSE) {
-                        USBTRACE("HID_PROTOCOL_MOUSE\r\n");
+                        USBTRACE("HID_PROTOCOL_MOUSE\n");
                         for(uint8_t i = 0; i < num_of_conf; i++) {
                                 ConfigDescParser<
                                         USB_CLASS_HID,
@@ -487,7 +487,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Init(uint8_t parent, uint8_t port, bool lowspeed
                         delay(25);
                 }
         }
-        USBTRACE("BM configured\r\n");
+        USBTRACE("BM configured\n");
 
         bPollEnable = true;
         return 0;
@@ -632,7 +632,7 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Poll() {
                                         USBTRACE1(" ", 0x80);
                                 }
                                 if(read)
-                                        USBTRACE1("\r\n", 0x80);
+                                        USBTRACE1("\n", 0x80);
 #endif
                         }
 

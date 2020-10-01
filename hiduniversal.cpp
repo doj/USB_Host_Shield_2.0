@@ -423,15 +423,14 @@ uint8_t HIDUniversal::Poll() {
 			Notifyc(i+'0', 0x80);
 			Notifyc('/', 0x80);
 			Notifyc(index+'0', 0x80);
-                        NotifyStr("Buf:", 0x80);
-
+                        Notify(PSTR("Buf:"), 0x80);
                         for(uint8_t i = 0; i < read; i++) {
-                                D_PrintHex<uint8_t > (buf[i], 0x80);
+                                D_PrintHex<uint8_t>(buf[i], 0x80);
                                 Notify(PSTR(" "), 0x80);
                         }
-
                         Notify(PSTR("\n"), 0x80);
 #endif
+
                         ParseHIDData(this, bHasReportId, (uint8_t)read, buf);
 
                         HIDReportParser *prs = GetReportParser(bHasReportId ? *buf : 0);

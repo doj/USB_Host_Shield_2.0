@@ -114,7 +114,7 @@ uint8_t USBH_MIDI::Init(uint8_t parent, uint8_t port, bool lowspeed)
         EpInfo     *oldep_ptr = NULL;
         uint8_t    num_of_conf;  // number of configurations
 
-        USBTRACE("\rMIDI Init\r\n");
+        USBTRACE("\rMIDI Init\n");
 
         //for reconnect
         for(uint8_t i=epDataInIndex; i<=epDataOutIndex; i++) {
@@ -212,7 +212,7 @@ uint8_t USBH_MIDI::Init(uint8_t parent, uint8_t port, bool lowspeed)
                         break;
         } // for
 
-        USBTRACE2("\r\nNumEP:", bNumEP);
+        USBTRACE2("\nNumEP:", bNumEP);
 
         if( bNumEP < 2 ){  //Device not found.
                 rcode = 0xff;
@@ -220,7 +220,7 @@ uint8_t USBH_MIDI::Init(uint8_t parent, uint8_t port, bool lowspeed)
         }
 
         if( !isMidiFound ){ //MIDI Device not found. Try last Bulk transfer device
-                USBTRACE("MIDI not found. Attempts bulk device\r\n");
+                USBTRACE("MIDI not found. Attempts bulk device\n");
                 epInfo[epDataInIndex].epAddr      = epInfo[epDataInIndexVSP].epAddr;
                 epInfo[epDataInIndex].maxPktSize  = epInfo[epDataInIndexVSP].maxPktSize;
                 epInfo[epDataOutIndex].epAddr     = epInfo[epDataOutIndexVSP].epAddr;
@@ -239,7 +239,7 @@ uint8_t USBH_MIDI::Init(uint8_t parent, uint8_t port, bool lowspeed)
                 goto FailSetConfDescr;
         }
         bPollEnable = true;
-        USBTRACE("Init done.\r\n");
+        USBTRACE("Init done.\n");
         return 0;
 FailGetDevDescr:
 FailSetDevTblEntry:
@@ -286,21 +286,21 @@ uint8_t USBH_MIDI::parseConfigDescr( uint8_t addr, uint8_t conf )
                         bConfNum = buf_ptr[5];
                         break;
                   case  USB_DESCRIPTOR_INTERFACE :
-                        USBTRACE("\r\nConf:"), D_PrintHex(bConfNum, 0x80);
+                        USBTRACE("\nConf:"), D_PrintHex(bConfNum, 0x80);
                         USBTRACE(" Int:"), D_PrintHex(buf_ptr[2], 0x80);
                         USBTRACE(" Alt:"), D_PrintHex(buf_ptr[3], 0x80);
                         USBTRACE(" EPs:"), D_PrintHex(buf_ptr[4], 0x80);
                         USBTRACE(" IntCl:"), D_PrintHex(buf_ptr[5], 0x80);
                         USBTRACE(" IntSubCl:"), D_PrintHex(buf_ptr[6], 0x80);
-                        USBTRACE("\r\n");
+                        USBTRACE("\n");
 
                         if( buf_ptr[5] == USB_CLASS_AUDIO && buf_ptr[6] == USB_SUBCLASS_MIDISTREAMING ) {  //p[5]; bInterfaceClass = 1(Audio), p[6]; bInterfaceSubClass = 3(MIDI Streaming)
                                 isMidiFound = true; //MIDI device found.
                                 isMidi      = true;
-                                USBTRACE("MIDI Device\r\n");
+                                USBTRACE("MIDI Device\n");
                         }else{
                                 isMidi = false;
-                                USBTRACE("No MIDI Device\r\n");
+                                USBTRACE("No MIDI Device\n");
                         }
                         break;
                   case USB_DESCRIPTOR_ENDPOINT :
@@ -464,7 +464,7 @@ uint8_t USBH_MIDI::SendData(uint8_t *dataptr, uint8_t nCable)
 #ifdef DEBUG_USB_HOST
 void USBH_MIDI::PrintEndpointDescriptor( const USB_ENDPOINT_DESCRIPTOR* ep_ptr )
 {
-        USBTRACE("Endpoint descriptor:\r\n");
+        USBTRACE("Endpoint descriptor:\n");
         USBTRACE2(" Length:\t", ep_ptr->bLength);
         USBTRACE2(" Type:\t\t", ep_ptr->bDescriptorType);
         USBTRACE2(" Address:\t", ep_ptr->bEndpointAddress);

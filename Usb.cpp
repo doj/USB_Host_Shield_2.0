@@ -103,19 +103,19 @@ uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_l
         *nak_limit = (0x0001UL << (((*ppep)->bmNakPower > USB_NAK_MAX_POWER) ? USB_NAK_MAX_POWER : (*ppep)->bmNakPower));
         (*nak_limit)--;
         /*
-          USBTRACE2("\r\nAddress: ", addr);
+          USBTRACE2("\nAddress: ", addr);
           USBTRACE2(" EP: ", ep);
           USBTRACE2(" NAK Power: ",(*ppep)->bmNakPower);
           USBTRACE2(" NAK Limit: ", nak_limit);
-          USBTRACE("\r\n");
+          USBTRACE("\n");
          */
         regWr(rPERADDR, addr); //set peripheral address
 
         uint8_t mode = regRd(rMODE);
 
-        //Serial.print("\r\nMode: ");
+        //Serial.print("\nMode: ");
         //Serial.println( mode, HEX);
-        //Serial.print("\r\nLS: ");
+        //Serial.print("\nLS: ");
         //Serial.println(p->lowspeed, HEX);
 
         // Set bmLOWSPEED and bmHUBPRE in case of low-speed device, reset them otherwise
@@ -270,7 +270,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
                  * NOTE: I've seen this happen with SPI corruption -- xxxajk
                  */
                 if((regRd(rHIRQ) & bmRCVDAVIRQ) == 0) {
-                        //printf(">>>>>>>> Problem! NO RCVDAVIRQ!\r\n");
+                        //printf(">>>>>>>> Problem! NO RCVDAVIRQ!\n");
                         rcode = 0xf0; //receive error
                         break;
                 }
@@ -279,7 +279,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
                 if(pktsize > nbytes) {
                         // This can happen. Use of assert on Arduino locks up the Arduino.
                         // So I will trim the value, and hope for the best.
-                        //printf(">>>>>>>> Problem! Wanted %i bytes but got %i.\r\n", nbytes, pktsize);
+                        //printf(">>>>>>>> Problem! Wanted %i bytes but got %i.\n", nbytes, pktsize);
                         pktsize = nbytes;
                 }
 
@@ -300,7 +300,7 @@ uint8_t USB::InTransfer(EpInfo *pep, uint16_t nak_limit, uint16_t *nbytesptr, ui
                 {
                         // Save toggle value
                         pep->bmRcvToggle = ((regRd(rHRSL) & bmRCVTOGRD)) ? 1 : 0;
-                        //printf("\r\n");
+                        //printf("\n");
                         rcode = 0;
                         break;
                 } else if(bInterval > 0)
@@ -563,7 +563,7 @@ void USB::Task(void) //USB state machine
                         else break; // don't fall through
                 case USB_STATE_CONFIGURING:
 
-                        //Serial.print("\r\nConf.LS: ");
+                        //Serial.print("\nConf.LS: ");
                         //Serial.println(lowspeed, HEX);
 
                         rcode = Configuring(0, 0, lowspeed);
@@ -625,7 +625,7 @@ uint8_t USB::DefaultAddressing(uint8_t parent, uint8_t port, bool lowspeed) {
 };
 
 uint8_t USB::AttemptConfig(uint8_t driver, uint8_t parent, uint8_t port, bool lowspeed) {
-        //printf("AttemptConfig: parent = %i, port = %i\r\n", parent, port);
+        //printf("AttemptConfig: parent = %i, port = %i\n", parent, port);
         uint8_t retries = 0;
 
 again:
@@ -709,7 +709,7 @@ again:
  */
 uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
         //uint8_t bAddress = 0;
-        //printf("Configuring: parent = %i, port = %i\r\n", parent, port);
+        //printf("Configuring: parent = %i, port = %i\n", parent, port);
         uint8_t devConfigIndex;
         uint8_t rcode = 0;
         uint8_t buf[sizeof (USB_DEVICE_DESCRIPTOR)];
@@ -729,7 +729,7 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
         // Get pointer to pseudo device with address 0 assigned
         p = addrPool.GetUsbDevicePtr(0);
         if(!p) {
-                //printf("Configuring error: USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL\r\n");
+                //printf("Configuring error: USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL\n");
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
@@ -749,7 +749,7 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
         p->epinfo = oldep_ptr;
 
         if(rcode) {
-                //printf("Configuring error: Can't get USB_DEVICE_DESCRIPTOR\r\n");
+                //printf("Configuring error: Can't get USB_DEVICE_DESCRIPTOR\n");
                 return rcode;
         }
 
@@ -788,7 +788,7 @@ uint8_t USB::Configuring(uint8_t parent, uint8_t port, bool lowspeed) {
                 if(devConfig[devConfigIndex]->DEVSUBCLASSOK(subklass) && (devConfig[devConfigIndex]->VIDPIDOK(vid, pid) || devConfig[devConfigIndex]->DEVCLASSOK(klass))) continue; // If this is true it means it must have returned USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED above
                 rcode = AttemptConfig(devConfigIndex, parent, port, lowspeed);
 
-                //printf("ERROR ENUMERATING %2.2x\r\n", rcode);
+                //printf("ERROR ENUMERATING %2.2x\n", rcode);
                 if(!(rcode == USB_DEV_CONFIG_ERROR_DEVICE_NOT_SUPPORTED || rcode == USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE)) {
                         // in case of an error dev_index should be reset to 0
                         //                in order to start from the very beginning the
@@ -846,7 +846,7 @@ uint8_t USB::getConfDescr(uint8_t addr, uint8_t ep, uint8_t conf, USBReadParser 
 
         uint16_t total = ucd->wTotalLength;
 
-        //USBTRACE2("\r\ntotal conf.size:", total);
+        //USBTRACE2("\ntotal conf.size:", total);
 
         return ( ctrlReq(addr, ep, bmREQ_GET_DESCR, USB_REQUEST_GET_DESCRIPTOR, conf, USB_DESCRIPTOR_CONFIGURATION, 0x0000, total, bufSize, buf, p));
 }

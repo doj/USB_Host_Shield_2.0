@@ -119,8 +119,8 @@ uint8_t BulkOnly::SCSITransaction10(CDB10_t *cdb, uint16_t buf_size, void *buf, 
  * @return
  */
 uint8_t BulkOnly::LockMedia(uint8_t lun, uint8_t lock) {
-        Notify(PSTR("\r\nLockMedia\r\n"), 0x80);
-        Notify(PSTR("---------\r\n"), 0x80);
+        Notify(PSTR("\nLockMedia\n"), 0x80);
+        Notify(PSTR("---------\n"), 0x80);
 
         CDB6_t cdb = CDB6_t(SCSI_CMD_PREVENT_REMOVAL, lun, (uint8_t)0, lock);
         return SCSITransaction6(&cdb, (uint16_t)0, NULL, (uint8_t)MASS_CMD_DIR_IN);
@@ -135,8 +135,8 @@ uint8_t BulkOnly::LockMedia(uint8_t lun, uint8_t lock) {
  * @return 0 on success
  */
 uint8_t BulkOnly::MediaCTL(uint8_t lun, uint8_t ctl) {
-        Notify(PSTR("\r\nMediaCTL\r\n"), 0x80);
-        Notify(PSTR("-----------------\r\n"), 0x80);
+        Notify(PSTR("\nMediaCTL\n"), 0x80);
+        Notify(PSTR("-----------------\n"), 0x80);
 
         uint8_t rcode = MASS_ERR_UNIT_NOT_READY;
         if(bAddress) {
@@ -160,15 +160,15 @@ uint8_t BulkOnly::MediaCTL(uint8_t lun, uint8_t ctl) {
  */
 uint8_t BulkOnly::Read(uint8_t lun, uint32_t addr, uint16_t bsize, uint8_t blocks, uint8_t *buf) {
         if(!LUNOk[lun]) return MASS_ERR_NO_MEDIA;
-        Notify(PSTR("\r\nRead LUN:\t"), 0x80);
+        Notify(PSTR("\nRead LUN:\t"), 0x80);
         D_PrintHex<uint8_t > (lun, 0x90);
-        Notify(PSTR("\r\nLBA:\t\t"), 0x90);
+        Notify(PSTR("\nLBA:\t\t"), 0x90);
         D_PrintHex<uint32_t > (addr, 0x90);
-        Notify(PSTR("\r\nblocks:\t\t"), 0x90);
+        Notify(PSTR("\nblocks:\t\t"), 0x90);
         D_PrintHex<uint8_t > (blocks, 0x90);
-        Notify(PSTR("\r\nblock size:\t"), 0x90);
+        Notify(PSTR("\nblock size:\t"), 0x90);
         D_PrintHex<uint16_t > (bsize, 0x90);
-        Notify(PSTR("\r\n---------\r\n"), 0x80);
+        Notify(PSTR("\n---------\n"), 0x80);
         CDB10_t cdb = CDB10_t(SCSI_CMD_READ_10, lun, blocks, addr);
 
 again:
@@ -195,15 +195,15 @@ again:
 uint8_t BulkOnly::Write(uint8_t lun, uint32_t addr, uint16_t bsize, uint8_t blocks, const uint8_t * buf) {
         if(!LUNOk[lun]) return MASS_ERR_NO_MEDIA;
         if(!WriteOk[lun]) return MASS_ERR_WRITE_PROTECTED;
-        Notify(PSTR("\r\nWrite LUN:\t"), 0x80);
+        Notify(PSTR("\nWrite LUN:\t"), 0x80);
         D_PrintHex<uint8_t > (lun, 0x90);
-        Notify(PSTR("\r\nLBA:\t\t"), 0x90);
+        Notify(PSTR("\nLBA:\t\t"), 0x90);
         D_PrintHex<uint32_t > (addr, 0x90);
-        Notify(PSTR("\r\nblocks:\t\t"), 0x90);
+        Notify(PSTR("\nblocks:\t\t"), 0x90);
         D_PrintHex<uint8_t > (blocks, 0x90);
-        Notify(PSTR("\r\nblock size:\t"), 0x90);
+        Notify(PSTR("\nblock size:\t"), 0x90);
         D_PrintHex<uint16_t > (bsize, 0x90);
-        Notify(PSTR("\r\n---------\r\n"), 0x80);
+        Notify(PSTR("\n---------\n"), 0x80);
         CDB10_t cdb = CDB10_t(SCSI_CMD_WRITE_10, lun, blocks, addr);
 
 again:
@@ -264,7 +264,7 @@ uint8_t BulkOnly::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
         uint8_t rcode;
         UsbDevice *p = NULL;
         EpInfo *oldep_ptr = NULL;
-        USBTRACE("MS ConfigureDevice\r\n");
+        USBTRACE("MS ConfigureDevice\n");
         ClearAllEP();
         AddressPool &addrPool = pUsb->GetAddressPool();
 
@@ -280,7 +280,7 @@ uint8_t BulkOnly::ConfigureDevice(uint8_t parent, uint8_t port, bool lowspeed) {
         }
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -334,7 +334,7 @@ uint8_t BulkOnly::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
         uint8_t rcode;
         uint8_t num_of_conf = epInfo[1].epAddr; // number of configurations
         epInfo[1].epAddr = 0;
-        USBTRACE("MS Init\r\n");
+        USBTRACE("MS Init\n");
 
         AddressPool &addrPool = pUsb->GetAddressPool();
         UsbDevice *p = addrPool.GetUsbDevicePtr(bAddress);
@@ -426,12 +426,12 @@ uint8_t BulkOnly::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
                         printf("LUN %i `", lun);
                         uint8_t *buf = response.VendorID;
                         for(int i = 0; i < 28; i++) printf("%c", buf[i]);
-                        printf("'\r\nQualifier %1.1X ", response.PeripheralQualifier);
+                        printf("'\nQualifier %1.1X ", response.PeripheralQualifier);
                         printf("Device type %2.2X ", response.DeviceType);
                         printf("RMB %1.1X ", response.Removable);
                         printf("SSCS %1.1X ", response.SCCS);
                         uint8_t sv = response.Version;
-                        printf("SCSI version %2.2X\r\nDevice conforms to ", sv);
+                        printf("SCSI version %2.2X\nDevice conforms to ", sv);
                         switch(sv) {
                                 case 0:
                                         printf("No specific");
@@ -457,7 +457,7 @@ uint8_t BulkOnly::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
                                 default:
                                         printf("unknown");
                         }
-                        printf(" standards.\r\n");
+                        printf(" standards.\n");
 #endif
                         uint8_t tries = 0xf0;
                         while((rcode = TestUnitReady(lun))) {
@@ -487,12 +487,12 @@ uint8_t BulkOnly::Init(uint8_t parent __attribute__((unused)), uint8_t port __at
                 goto FailOnInit;
 
 #ifdef DEBUG_USB_HOST
-        USBTRACE("MS configured\r\n\r\n");
+        USBTRACE("MS configured\n\n");
 #endif
 
         bPollEnable = true;
 
-        //USBTRACE("Poll enabled\r\n");
+        //USBTRACE("Poll enabled\n");
         return 0;
 
 FailSetConfDescr:
@@ -614,13 +614,13 @@ bool BulkOnly::CheckLUN(uint8_t lun) {
 
         rcode = ReadCapacity10(lun, (uint8_t*)capacity.data);
         if(rcode) {
-                //printf(">>>>>>>>>>>>>>>>ReadCapacity returned %i\r\n", rcode);
+                //printf(">>>>>>>>>>>>>>>>ReadCapacity returned %i\n", rcode);
                 return false;
         }
         ErrorMessage<uint8_t > (PSTR(">>>>>>>>>>>>>>>>CAPACITY OK ON LUN"), lun);
         for(uint8_t i = 0; i < 8 /*sizeof (Capacity)*/; i++)
                 D_PrintHex<uint8_t > (capacity.data[i], 0x80);
-        Notify(PSTR("\r\n\r\n"), 0x80);
+        Notify(PSTR("\n\n"), 0x80);
         // Only 512/1024/2048/4096 are valid values!
         uint32_t c = BMAKE32(capacity.data[4], capacity.data[5], capacity.data[6], capacity.data[7]);
         if(c != 0x0200LU && c != 0x0400LU && c != 0x0800LU && c != 0x1000LU) {
@@ -663,7 +663,7 @@ void BulkOnly::CheckMedia() {
                         printf("#");
                 else printf(".");
         }
-        printf("\r\n");
+        printf("\n");
 #endif
         qNextPollTime = (uint32_t)millis() + 2000;
 }
@@ -719,8 +719,8 @@ uint8_t BulkOnly::GetMaxLUN(uint8_t *plun) {
  * @return
  */
 uint8_t BulkOnly::Inquiry(uint8_t lun, uint16_t bsize, uint8_t *buf) {
-        Notify(PSTR("\r\nInquiry\r\n"), 0x80);
-        Notify(PSTR("---------\r\n"), 0x80);
+        Notify(PSTR("\nInquiry\n"), 0x80);
+        Notify(PSTR("---------\n"), 0x80);
 
         CDB6_t cdb = CDB6_t(SCSI_CMD_INQUIRY, lun, 0LU, (uint8_t)bsize, 0);
         uint8_t rc = SCSITransaction6(&cdb, bsize, buf, (uint8_t)MASS_CMD_DIR_IN);
@@ -739,8 +739,8 @@ uint8_t BulkOnly::TestUnitReady(uint8_t lun) {
         if(!bAddress)
                 return MASS_ERR_UNIT_NOT_READY;
 
-        Notify(PSTR("\r\nTestUnitReady\r\n"), 0x80);
-        Notify(PSTR("-----------------\r\n"), 0x80);
+        Notify(PSTR("\nTestUnitReady\n"), 0x80);
+        Notify(PSTR("-----------------\n"), 0x80);
 
         CDB6_t cdb = CDB6_t(SCSI_CMD_TEST_UNIT_READY, lun, (uint8_t)0, 0);
         return SCSITransaction6(&cdb, 0, NULL, (uint8_t)MASS_CMD_DIR_IN);
@@ -759,8 +759,8 @@ uint8_t BulkOnly::TestUnitReady(uint8_t lun) {
  * @return
  */
 uint8_t BulkOnly::ModeSense6(uint8_t lun, uint8_t pc, uint8_t page, uint8_t subpage, uint8_t len, uint8_t * pbuf) {
-        Notify(PSTR("\r\rModeSense\r\n"), 0x80);
-        Notify(PSTR("------------\r\n"), 0x80);
+        Notify(PSTR("\r\rModeSense\n"), 0x80);
+        Notify(PSTR("------------\n"), 0x80);
 
         CDB6_t cdb = CDB6_t(SCSI_CMD_MODE_SENSE_6, lun, (uint32_t)((((pc << 6) | page) << 8) | subpage), len, 0);
         return SCSITransaction6(&cdb, len, pbuf, (uint8_t)MASS_CMD_DIR_IN);
@@ -775,8 +775,8 @@ uint8_t BulkOnly::ModeSense6(uint8_t lun, uint8_t pc, uint8_t page, uint8_t subp
  * @return
  */
 uint8_t BulkOnly::ReadCapacity10(uint8_t lun, uint8_t *buf) {
-        Notify(PSTR("\r\nReadCapacity\r\n"), 0x80);
-        Notify(PSTR("---------------\r\n"), 0x80);
+        Notify(PSTR("\nReadCapacity\n"), 0x80);
+        Notify(PSTR("---------------\n"), 0x80);
 
         CDB10_t cdb = CDB10_t(SCSI_CMD_READ_CAPACITY_10, lun);
         return SCSITransaction10(&cdb, 8, buf, (uint8_t)MASS_CMD_DIR_IN);
@@ -804,7 +804,7 @@ uint8_t BulkOnly::Page3F(uint8_t lun) {
                         D_PrintHex<uint8_t > (buf[i], 0x80);
                         Notify(PSTR(" "), 0x80);
                 }
-                Notify(PSTR("\r\n"), 0x80);
+                Notify(PSTR("\n"), 0x80);
         }
         return rc;
 }
@@ -818,8 +818,8 @@ uint8_t BulkOnly::Page3F(uint8_t lun) {
  * @return
  */
 uint8_t BulkOnly::RequestSense(uint8_t lun, uint16_t size, uint8_t *buf) {
-        Notify(PSTR("\r\nRequestSense\r\n"), 0x80);
-        Notify(PSTR("----------------\r\n"), 0x80);
+        Notify(PSTR("\nRequestSense\n"), 0x80);
+        Notify(PSTR("----------------\n"), 0x80);
 
         CDB6_t cdb = CDB6_t(SCSI_CMD_REQUEST_SENSE, lun, 0LU, (uint8_t)size, 0);
         CommandBlockWrapper cbw = CommandBlockWrapper(++dCBWTag, (uint32_t)size, &cdb, (uint8_t)MASS_CMD_DIR_IN);
@@ -875,8 +875,8 @@ void BulkOnly::Reset() {
  * @return 0 if successful
  */
 uint8_t BulkOnly::ResetRecovery() {
-        Notify(PSTR("\r\nResetRecovery\r\n"), 0x80);
-        Notify(PSTR("-----------------\r\n"), 0x80);
+        Notify(PSTR("\nResetRecovery\n"), 0x80);
+        Notify(PSTR("-----------------\n"), 0x80);
 
         delay(6);
         Reset();
@@ -928,11 +928,11 @@ void BulkOnly::ClearAllEP() {
  */
 bool BulkOnly::IsValidCSW(CommandStatusWrapper *pcsw, CommandBlockWrapperBase *pcbw) {
         if(pcsw->dCSWSignature != MASS_CSW_SIGNATURE) {
-                Notify(PSTR("CSW:Sig error\r\n"), 0x80);
+                Notify(PSTR("CSW:Sig error\n"), 0x80);
                 return false;
         }
         if(pcsw->dCSWTag != pcbw->dCBWTag) {
-                Notify(PSTR("CSW:Wrong tag\r\n"), 0x80);
+                Notify(PSTR("CSW:Wrong tag\n"), 0x80);
                 return false;
         }
         return true;
@@ -991,7 +991,7 @@ uint8_t BulkOnly::HandleUsbError(uint8_t error, uint8_t index) {
                                 }
                                 return MASS_ERR_SUCCESS;
                         default:
-                                ErrorMessage<uint8_t > (PSTR("\r\nUSB"), error);
+                                ErrorMessage<uint8_t > (PSTR("\nUSB"), error);
                                 return MASS_ERR_GENERAL_USB_ERROR;
                 }
                 count--;
@@ -1024,7 +1024,7 @@ uint8_t BulkOnly::Transaction(CommandBlockWrapper *pcbw, uint16_t buf_size, void
 
 #if MS_WANT_PARSER
         uint16_t bytes = (pcbw->dCBWDataTransferLength > buf_size) ? buf_size : pcbw->dCBWDataTransferLength;
-        printf("Transfersize %i\r\n", bytes);
+        printf("Transfersize %i\n", bytes);
         delay(1000);
 
         bool callback = (flags & MASS_TRANS_FLG_CALLBACK) == MASS_TRANS_FLG_CALLBACK;
@@ -1080,8 +1080,8 @@ uint8_t BulkOnly::Transaction(CommandBlockWrapper *pcbw, uint16_t buf_size, void
                         if(tries) ResetRecovery();
                 }
                 if(!ret) {
-                        Notify(PSTR("CBW:\t\tOK\r\n"), 0x80);
-                        Notify(PSTR("Data Stage:\tOK\r\n"), 0x80);
+                        Notify(PSTR("CBW:\t\tOK\n"), 0x80);
+                        Notify(PSTR("Data Stage:\tOK\n"), 0x80);
                 } else {
                         // Throw away csw, IT IS NOT OF ANY USE.
                         ResetRecovery();
@@ -1096,7 +1096,7 @@ uint8_t BulkOnly::Transaction(CommandBlockWrapper *pcbw, uint16_t buf_size, void
                                 //ErrorMessage<uint32_t > (PSTR("CSW.dCBWTag"), csw.dCSWTag);
                                 //ErrorMessage<uint8_t > (PSTR("bCSWStatus"), csw.bCSWStatus);
                                 //ErrorMessage<uint32_t > (PSTR("dCSWDataResidue"), csw.dCSWDataResidue);
-                                Notify(PSTR("CSW:\t\tOK\r\n\r\n"), 0x80);
+                                Notify(PSTR("CSW:\t\tOK\n\n"), 0x80);
                                 return csw.bCSWStatus;
                         } else {
                                 // NOTE! Sometimes this is caused by the reported residue being wrong.
@@ -1104,7 +1104,7 @@ uint8_t BulkOnly::Transaction(CommandBlockWrapper *pcbw, uint16_t buf_size, void
                                 // I own one... 05e3:0701 Genesys Logic, Inc. USB 2.0 IDE Adapter.
                                 // Other devices that exhibit this behavior exist in the wild too.
                                 // Be sure to check quirks in the Linux source code before reporting a bug. --xxxajk
-                                Notify(PSTR("Invalid CSW\r\n"), 0x80);
+                                Notify(PSTR("Invalid CSW\n"), 0x80);
                                 ResetRecovery();
                                 //return MASS_ERR_SUCCESS;
                                 return MASS_ERR_INVALID_CSW;
@@ -1162,7 +1162,7 @@ uint8_t BulkOnly::HandleSCSIError(uint8_t status) {
                                         D_PrintHex<uint8_t > (rsp.CmdSpecificInformation[i], 0x80);
                                         Notify(PSTR(" "), 0x80);
                                 }
-                                Notify(PSTR("\r\n"), 0x80);
+                                Notify(PSTR("\n"), 0x80);
                         }
                         ErrorMessage<uint8_t > (PSTR("Sense Key"), rsp.bmSenseKey);
                         ErrorMessage<uint8_t > (PSTR("Add Sense Code"), rsp.bAdditionalSenseCode);
@@ -1219,19 +1219,19 @@ uint8_t BulkOnly::HandleSCSIError(uint8_t status) {
  */
 void BulkOnly::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR * ep_ptr) {
         Notify(PSTR("Endpoint descriptor:"), 0x80);
-        Notify(PSTR("\r\nLength:\t\t"), 0x80);
+        Notify(PSTR("\nLength:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bLength, 0x80);
-        Notify(PSTR("\r\nType:\t\t"), 0x80);
+        Notify(PSTR("\nType:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bDescriptorType, 0x80);
-        Notify(PSTR("\r\nAddress:\t"), 0x80);
+        Notify(PSTR("\nAddress:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bEndpointAddress, 0x80);
-        Notify(PSTR("\r\nAttributes:\t"), 0x80);
+        Notify(PSTR("\nAttributes:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bmAttributes, 0x80);
-        Notify(PSTR("\r\nMaxPktSize:\t"), 0x80);
+        Notify(PSTR("\nMaxPktSize:\t"), 0x80);
         D_PrintHex<uint16_t > (ep_ptr->wMaxPacketSize, 0x80);
-        Notify(PSTR("\r\nPoll Intrv:\t"), 0x80);
+        Notify(PSTR("\nPoll Intrv:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bInterval, 0x80);
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 }
 
 
@@ -1247,8 +1247,8 @@ void BulkOnly::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR * ep_ptr) {
 uint8_t BulkOnly::Read(uint8_t lun __attribute__((unused)), uint32_t addr __attribute__((unused)), uint16_t bsize __attribute__((unused)), uint8_t blocks __attribute__((unused)), USBReadParser * prs __attribute__((unused))) {
 #if MS_WANT_PARSER
         if(!LUNOk[lun]) return MASS_ERR_NO_MEDIA;
-        Notify(PSTR("\r\nRead (With parser)\r\n"), 0x80);
-        Notify(PSTR("---------\r\n"), 0x80);
+        Notify(PSTR("\nRead (With parser)\n"), 0x80);
+        Notify(PSTR("---------\n"), 0x80);
 
         CommandBlockWrapper cbw = CommandBlockWrapper();
 

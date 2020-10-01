@@ -23,7 +23,7 @@
 void PSBuzz::ParseHIDData(USBHID *hid __attribute__((unused)), bool is_rpt_id __attribute__((unused)), uint8_t len, uint8_t *buf) {
         if (HIDUniversal::VID == PSBUZZ_VID && HIDUniversal::PID == PSBUZZ_PID && len > 2 && buf) {
 #ifdef PRINTREPORT
-                Notify(PSTR("\r\n"), 0x80);
+                Notify(PSTR("\n"), 0x80);
                 for (uint8_t i = 0; i < len; i++) {
                         D_PrintHex<uint8_t > (buf[i], 0x80);
                         Notify(PSTR(" "), 0x80);

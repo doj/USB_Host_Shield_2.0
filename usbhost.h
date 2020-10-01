@@ -360,7 +360,7 @@ uint8_t* MAX3421e< SPI_SS, INTR >::bytesRd(uint8_t reg, uint8_t nbytes, uint8_t*
                 }
                 data_p++;
         }
-        printf("\r\n");
+        printf("\n");
 #else
                 *data_p++ = SPDR;
         }

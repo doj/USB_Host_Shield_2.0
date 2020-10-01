@@ -57,7 +57,7 @@ uint8_t ACM::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("ACM Init\r\n");
+        USBTRACE("ACM Init\n");
 
         if(bAddress)
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
@@ -69,7 +69,7 @@ uint8_t ACM::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
 
         if(!p->epinfo) {
-                USBTRACE("epinfo\r\n");
+                USBTRACE("epinfo\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -182,13 +182,13 @@ uint8_t ACM::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         if(rcode)
                 goto FailOnInit;
 
-        USBTRACE("ACM configured\r\n");
+        USBTRACE("ACM configured\n");
 
         ready = true;
 
         //bPollEnable = true;
 
-        //USBTRACE("Poll enabled\r\n");
+        //USBTRACE("Poll enabled\n");
         return 0;
 
 FailGetDevDescr:
@@ -351,17 +351,17 @@ uint8_t ACM::SendBreak(uint16_t duration) {
 
 void ACM::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr) {
         Notify(PSTR("Endpoint descriptor:"), 0x80);
-        Notify(PSTR("\r\nLength:\t\t"), 0x80);
+        Notify(PSTR("\nLength:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bLength, 0x80);
-        Notify(PSTR("\r\nType:\t\t"), 0x80);
+        Notify(PSTR("\nType:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bDescriptorType, 0x80);
-        Notify(PSTR("\r\nAddress:\t"), 0x80);
+        Notify(PSTR("\nAddress:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bEndpointAddress, 0x80);
-        Notify(PSTR("\r\nAttributes:\t"), 0x80);
+        Notify(PSTR("\nAttributes:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bmAttributes, 0x80);
-        Notify(PSTR("\r\nMaxPktSize:\t"), 0x80);
+        Notify(PSTR("\nMaxPktSize:\t"), 0x80);
         D_PrintHex<uint16_t > (ep_ptr->wMaxPacketSize, 0x80);
-        Notify(PSTR("\r\nPoll Intrv:\t"), 0x80);
+        Notify(PSTR("\nPoll Intrv:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bInterval, 0x80);
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 }

@@ -72,11 +72,11 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         // get memory address of USB device address pool
         AddressPool &addrPool = pUsb->GetAddressPool();
 
-        USBTRACE("\r\nADK Init");
+        USBTRACE("\nADK Init");
 
         // check if address has already been assigned to an instance
         if(bAddress) {
-                USBTRACE("\r\nAddress in use");
+                USBTRACE("\nAddress in use");
                 return USB_ERROR_CLASS_INSTANCE_ALREADY_IN_USE;
         }
 
@@ -84,12 +84,12 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         p = addrPool.GetUsbDevicePtr(0);
 
         if(!p) {
-                USBTRACE("\r\nAddress not found");
+                USBTRACE("\nAddress not found");
                 return USB_ERROR_ADDRESS_NOT_FOUND_IN_POOL;
         }
 
         if(!p->epinfo) {
-                USBTRACE("epinfo is null\r\n");
+                USBTRACE("epinfo is null\n");
                 return USB_ERROR_EPINFO_IS_NULL;
         }
 
@@ -127,7 +127,7 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 return rcode;
         }//if (rcode...
 
-        //USBTRACE2("\r\nAddr:", bAddress);
+        //USBTRACE2("\nAddr:", bAddress);
         // Spec says you should wait at least 200ms.
         //delay(300);
 
@@ -150,11 +150,11 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
         //check if ADK device is already in accessory mode; if yes, configure and exit
         if(udd->idVendor == ADK_VID &&
                 (udd->idProduct == ADK_PID || udd->idProduct == ADB_PID)) {
-                USBTRACE("\r\nAcc.mode device detected");
+                USBTRACE("\nAcc.mode device detected");
                 /* go through configurations, find first bulk-IN, bulk-OUT EP, fill epInfo and quit */
                 num_of_conf = udd->bNumConfigurations;
 
-                //USBTRACE2("\r\nNC:",num_of_conf);
+                //USBTRACE2("\nNC:",num_of_conf);
                 for(uint8_t i = 0; i < num_of_conf; i++) {
                         ConfigDescParser < 0, 0, 0, 0 > confDescrParser(this);
                         delay(1);
@@ -162,7 +162,7 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 #if defined(XOOM)
                         //added by Jaylen Scott Vanorden
                         if(rcode) {
-                                USBTRACE2("\r\nGot 1st bad code for config: ", rcode);
+                                USBTRACE2("\nGot 1st bad code for config: ", rcode);
                                 // Try once more
                                 rcode = pUsb->getConfDescr(bAddress, 0, i, &confDescrParser);
                         }
@@ -190,22 +190,22 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 }
                 /* print endpoint structure */
                 /*
-                USBTRACE("\r\nEndpoint Structure:");
-                USBTRACE("\r\nEP0:");
-                USBTRACE2("\r\nAddr: ", epInfo[0].epAddr);
-                USBTRACE2("\r\nMax.pkt.size: ", epInfo[0].maxPktSize);
-                USBTRACE2("\r\nAttr: ", epInfo[0].epAttribs);
-                USBTRACE("\r\nEpout:");
-                USBTRACE2("\r\nAddr: ", epInfo[epDataOutIndex].epAddr);
-                USBTRACE2("\r\nMax.pkt.size: ", epInfo[epDataOutIndex].maxPktSize);
-                USBTRACE2("\r\nAttr: ", epInfo[epDataOutIndex].epAttribs);
-                USBTRACE("\r\nEpin:");
-                USBTRACE2("\r\nAddr: ", epInfo[epDataInIndex].epAddr);
-                USBTRACE2("\r\nMax.pkt.size: ", epInfo[epDataInIndex].maxPktSize);
-                USBTRACE2("\r\nAttr: ", epInfo[epDataInIndex].epAttribs);
+                USBTRACE("\nEndpoint Structure:");
+                USBTRACE("\nEP0:");
+                USBTRACE2("\nAddr: ", epInfo[0].epAddr);
+                USBTRACE2("\nMax.pkt.size: ", epInfo[0].maxPktSize);
+                USBTRACE2("\nAttr: ", epInfo[0].epAttribs);
+                USBTRACE("\nEpout:");
+                USBTRACE2("\nAddr: ", epInfo[epDataOutIndex].epAddr);
+                USBTRACE2("\nMax.pkt.size: ", epInfo[epDataOutIndex].maxPktSize);
+                USBTRACE2("\nAttr: ", epInfo[epDataOutIndex].epAttribs);
+                USBTRACE("\nEpin:");
+                USBTRACE2("\nAddr: ", epInfo[epDataInIndex].epAddr);
+                USBTRACE2("\nMax.pkt.size: ", epInfo[epDataInIndex].maxPktSize);
+                USBTRACE2("\nAttr: ", epInfo[epDataInIndex].epAttribs);
                  */
 
-                USBTRACE("\r\nConfiguration successful");
+                USBTRACE("\nConfiguration successful");
                 ready = true;
                 return 0; //successful configuration
         }//if( buf->idVendor == ADK_VID...
@@ -218,7 +218,7 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
 #if defined(XOOM)
                 //added by Jaylen Scott Vanorden
                 if(rcode) {
-                        USBTRACE2("\r\nGot 1st bad code for proto: ", rcode);
+                        USBTRACE2("\nGot 1st bad code for proto: ", rcode);
                         // Try once more
                         rcode = getProto((uint8_t*) & adkproto);
                 }
@@ -226,7 +226,7 @@ uint8_t ADK::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                 if(rcode) {
                         goto FailGetProto; //init fails
                 }
-                USBTRACE2("\r\nADK protocol rev. ", adkproto);
+                USBTRACE2("\nADK protocol rev. ", adkproto);
         }
 
         delay(100);
@@ -283,13 +283,13 @@ FailSetConfDescr:
 
 FailGetProto:
 #ifdef DEBUG_USB_HOST
-        USBTRACE("\r\ngetProto:");
+        USBTRACE("\ngetProto:");
         goto Fail;
 #endif
 
 FailSwAcc:
 #ifdef DEBUG_USB_HOST
-        USBTRACE("\r\nswAcc:");
+        USBTRACE("\nswAcc:");
         goto Fail;
 #endif
 
@@ -299,10 +299,10 @@ FailSwAcc:
         //
 SwAttempt:
 #ifdef DEBUG_USB_HOST
-        USBTRACE("\r\nAccessory mode switch attempt");
+        USBTRACE("\nAccessory mode switch attempt");
 Fail:
 #endif
-        //USBTRACE2("\r\nADK Init Failed, error code: ", rcode);
+        //USBTRACE2("\nADK Init Failed, error code: ", rcode);
         //NotifyFail(rcode);
         Release();
         return rcode;
@@ -345,8 +345,8 @@ uint8_t ADK::Release() {
 }
 
 uint8_t ADK::RcvData(uint16_t *bytes_rcvd, uint8_t *dataptr) {
-        //USBTRACE2("\r\nAddr: ", bAddress );
-        //USBTRACE2("\r\nEP: ",epInfo[epDataInIndex].epAddr);
+        //USBTRACE2("\nAddr: ", bAddress );
+        //USBTRACE2("\nEP: ",epInfo[epDataInIndex].epAddr);
         return pUsb->inTransfer(bAddress, epInfo[epDataInIndex].epAddr, bytes_rcvd, dataptr);
 }
 
@@ -356,17 +356,17 @@ uint8_t ADK::SndData(uint16_t nbytes, uint8_t *dataptr) {
 
 void ADK::PrintEndpointDescriptor(const USB_ENDPOINT_DESCRIPTOR* ep_ptr) {
         Notify(PSTR("Endpoint descriptor:"), 0x80);
-        Notify(PSTR("\r\nLength:\t\t"), 0x80);
+        Notify(PSTR("\nLength:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bLength, 0x80);
-        Notify(PSTR("\r\nType:\t\t"), 0x80);
+        Notify(PSTR("\nType:\t\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bDescriptorType, 0x80);
-        Notify(PSTR("\r\nAddress:\t"), 0x80);
+        Notify(PSTR("\nAddress:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bEndpointAddress, 0x80);
-        Notify(PSTR("\r\nAttributes:\t"), 0x80);
+        Notify(PSTR("\nAttributes:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bmAttributes, 0x80);
-        Notify(PSTR("\r\nMaxPktSize:\t"), 0x80);
+        Notify(PSTR("\nMaxPktSize:\t"), 0x80);
         D_PrintHex<uint16_t > (ep_ptr->wMaxPacketSize, 0x80);
-        Notify(PSTR("\r\nPoll Intrv:\t"), 0x80);
+        Notify(PSTR("\nPoll Intrv:\t"), 0x80);
         D_PrintHex<uint8_t > (ep_ptr->bInterval, 0x80);
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 }

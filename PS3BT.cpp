@@ -160,7 +160,7 @@ bool PS3BT::getStatus(StatusEnum c) {
 void PS3BT::printStatusString() {
         char statusOutput[102]; // Max string length plus null character
         if(PS3Connected || PS3NavigationConnected) {
-                strcpy_P(statusOutput, PSTR("\r\nConnectionStatus: "));
+                strcpy_P(statusOutput, PSTR("\nConnectionStatus: "));
 
                 if(getStatus(Plugged)) strcat_P(statusOutput, PSTR("Plugged"));
                 else if(getStatus(Unplugged)) strcat_P(statusOutput, PSTR("Unplugged"));
@@ -185,7 +185,7 @@ void PS3BT::printStatusString() {
                 else if(getStatus(Bluetooth)) strcat_P(statusOutput, PSTR("Bluetooth - Rumble is off"));
                 else strcat_P(statusOutput, PSTR("Error"));
         } else if(PS3MoveConnected) {
-                strcpy_P(statusOutput, PSTR("\r\nPowerRating: "));
+                strcpy_P(statusOutput, PSTR("\nPowerRating: "));
 
                 if(getStatus(MoveCharging)) strcat_P(statusOutput, PSTR("Charging"));
                 else if(getStatus(MoveNotCharging)) strcat_P(statusOutput, PSTR("Not Charging"));
@@ -196,7 +196,7 @@ void PS3BT::printStatusString() {
                 else if(getStatus(MoveFull)) strcat_P(statusOutput, PSTR("Full"));
                 else strcat_P(statusOutput, PSTR("Error"));
         } else
-                strcpy_P(statusOutput, PSTR("\r\nError"));
+                strcpy_P(statusOutput, PSTR("\nError"));
 
         USB_HOST_SERIAL.write(statusOutput);
 }
@@ -232,9 +232,9 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                                 remote_name_first = pBtd->remote_name[0]; // Store the first letter in remote name for the connection
 #ifdef DEBUG_USB_HOST
                                 if(pBtd->hci_version < 3) { // Check the HCI Version of the Bluetooth dongle
-                                        Notify(PSTR("\r\nYour dongle may not support reading the analog buttons, sensors and status\r\nYour HCI Version is: "), 0x80);
+                                        Notify(PSTR("\nYour dongle may not support reading the analog buttons, sensors and status\nYour HCI Version is: "), 0x80);
                                         Notify(pBtd->hci_version, 0x80);
-                                        Notify(PSTR("\r\nBut should be at least 3\r\nThis means that it doesn't support Bluetooth Version 2.0+EDR"), 0x80);
+                                        Notify(PSTR("\nBut should be at least 3\nThis means that it doesn't support Bluetooth Version 2.0+EDR"), 0x80);
                                 }
 #endif
                         }
@@ -246,7 +246,7 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                 if((l2capinbuf[6] | (l2capinbuf[7] << 8)) == 0x0001U) { // l2cap_control - Channel ID for ACL-U
                         if(l2capinbuf[8] == L2CAP_CMD_COMMAND_REJECT) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nL2CAP Command Rejected - Reason: "), 0x80);
+                                Notify(PSTR("\nL2CAP Command Rejected - Reason: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[13], 0x80);
                                 Notify(PSTR(" "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[12], 0x80);
@@ -261,7 +261,7 @@ void PS3BT::ACLData(uint8_t* ACLData) {
 #endif
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONNECTION_REQUEST) {
 #ifdef EXTRADEBUG
-                                Notify(PSTR("\r\nL2CAP Connection Request - PSM: "), 0x80);
+                                Notify(PSTR("\nL2CAP Connection Request - PSM: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[13], 0x80);
                                 Notify(PSTR(" "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[12], 0x80);
@@ -286,32 +286,32 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONFIG_RESPONSE) {
                                 if((l2capinbuf[16] | (l2capinbuf[17] << 8)) == 0x0000) { // Success
                                         if(l2capinbuf[12] == control_dcid[0] && l2capinbuf[13] == control_dcid[1]) {
-                                                //Notify(PSTR("\r\nHID Control Configuration Complete"), 0x80);
+                                                //Notify(PSTR("\nHID Control Configuration Complete"), 0x80);
                                                 l2cap_set_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS);
                                         } else if(l2capinbuf[12] == interrupt_dcid[0] && l2capinbuf[13] == interrupt_dcid[1]) {
-                                                //Notify(PSTR("\r\nHID Interrupt Configuration Complete"), 0x80);
+                                                //Notify(PSTR("\nHID Interrupt Configuration Complete"), 0x80);
                                                 l2cap_set_flag(L2CAP_FLAG_CONFIG_INTERRUPT_SUCCESS);
                                         }
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_CONFIG_REQUEST) {
                                 if(l2capinbuf[12] == control_dcid[0] && l2capinbuf[13] == control_dcid[1]) {
-                                        //Notify(PSTR("\r\nHID Control Configuration Request"), 0x80);
+                                        //Notify(PSTR("\nHID Control Configuration Request"), 0x80);
                                         pBtd->l2cap_config_response(hci_handle, l2capinbuf[9], control_scid);
                                 } else if(l2capinbuf[12] == interrupt_dcid[0] && l2capinbuf[13] == interrupt_dcid[1]) {
-                                        //Notify(PSTR("\r\nHID Interrupt Configuration Request"), 0x80);
+                                        //Notify(PSTR("\nHID Interrupt Configuration Request"), 0x80);
                                         pBtd->l2cap_config_response(hci_handle, l2capinbuf[9], interrupt_scid);
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_DISCONNECT_REQUEST) {
                                 if(l2capinbuf[12] == control_dcid[0] && l2capinbuf[13] == control_dcid[1]) {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nDisconnect Request: Control Channel"), 0x80);
+                                        Notify(PSTR("\nDisconnect Request: Control Channel"), 0x80);
 #endif
                                         identifier = l2capinbuf[9];
                                         pBtd->l2cap_disconnection_response(hci_handle, identifier, control_dcid, control_scid);
                                         Reset();
                                 } else if(l2capinbuf[12] == interrupt_dcid[0] && l2capinbuf[13] == interrupt_dcid[1]) {
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nDisconnect Request: Interrupt Channel"), 0x80);
+                                        Notify(PSTR("\nDisconnect Request: Interrupt Channel"), 0x80);
 #endif
                                         identifier = l2capinbuf[9];
                                         pBtd->l2cap_disconnection_response(hci_handle, identifier, interrupt_dcid, interrupt_scid);
@@ -319,23 +319,23 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                                 }
                         } else if(l2capinbuf[8] == L2CAP_CMD_DISCONNECT_RESPONSE) {
                                 if(l2capinbuf[12] == control_scid[0] && l2capinbuf[13] == control_scid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Response: Control Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Response: Control Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_CONTROL_RESPONSE);
                                 } else if(l2capinbuf[12] == interrupt_scid[0] && l2capinbuf[13] == interrupt_scid[1]) {
-                                        //Notify(PSTR("\r\nDisconnect Response: Interrupt Channel"), 0x80);
+                                        //Notify(PSTR("\nDisconnect Response: Interrupt Channel"), 0x80);
                                         identifier = l2capinbuf[9];
                                         l2cap_set_flag(L2CAP_FLAG_DISCONNECT_INTERRUPT_RESPONSE);
                                 }
                         }
 #ifdef EXTRADEBUG
                         else {
-                                Notify(PSTR("\r\nL2CAP Unknown Signaling Command: "), 0x80);
+                                Notify(PSTR("\nL2CAP Unknown Signaling Command: "), 0x80);
                                 D_PrintHex<uint8_t > (l2capinbuf[8], 0x80);
                         }
 #endif
                 } else if(l2capinbuf[6] == interrupt_dcid[0] && l2capinbuf[7] == interrupt_dcid[1]) { // l2cap_interrupt
-                        //Notify(PSTR("\r\nL2CAP Interrupt"), 0x80);
+                        //Notify(PSTR("\nL2CAP Interrupt"), 0x80);
                         if(PS3Connected || PS3MoveConnected || PS3NavigationConnected) {
                                 /* Read Report */
                                 if(l2capinbuf[8] == 0xA1) { // HID_THDR_DATA_INPUT
@@ -346,7 +346,7 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                                         else if(PS3MoveConnected)
                                                 ButtonState = (uint32_t)(l2capinbuf[10] | ((uint16_t)l2capinbuf[11] << 8) | ((uint32_t)l2capinbuf[12] << 16));
 
-                                        //Notify(PSTR("\r\nButtonState", 0x80);
+                                        //Notify(PSTR("\nButtonState", 0x80);
                                         //PrintHex<uint32_t>(ButtonState, 0x80);
 
                                         if(ButtonState != OldButtonState) {
@@ -359,7 +359,7 @@ void PS3BT::ACLData(uint8_t* ACLData) {
                                                 D_PrintHex<uint8_t > (l2capinbuf[i], 0x80);
                                                 Notify(PSTR(" "), 0x80);
                                         }
-                                        Notify(PSTR("\r\n"), 0x80);
+                                        Notify(PSTR("\n"), 0x80);
 #endif
                                 }
                         }
@@ -373,7 +373,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_WAIT:
                         if(l2cap_check_flag(L2CAP_FLAG_CONNECTION_CONTROL_REQUEST)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHID Control Incoming Connection Request"), 0x80);
+                                Notify(PSTR("\nHID Control Incoming Connection Request"), 0x80);
 #endif
                                 pBtd->l2cap_connection_response(hci_handle, identifier, control_dcid, control_scid, PENDING);
                                 delay(1);
@@ -388,7 +388,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_CONTROL_SUCCESS:
                         if(l2cap_check_flag(L2CAP_FLAG_CONFIG_CONTROL_SUCCESS)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHID Control Successfully Configured"), 0x80);
+                                Notify(PSTR("\nHID Control Successfully Configured"), 0x80);
 #endif
                                 l2cap_state = L2CAP_INTERRUPT_SETUP;
                         }
@@ -397,7 +397,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_INTERRUPT_SETUP:
                         if(l2cap_check_flag(L2CAP_FLAG_CONNECTION_INTERRUPT_REQUEST)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHID Interrupt Incoming Connection Request"), 0x80);
+                                Notify(PSTR("\nHID Interrupt Incoming Connection Request"), 0x80);
 #endif
                                 pBtd->l2cap_connection_response(hci_handle, identifier, interrupt_dcid, interrupt_scid, PENDING);
                                 delay(1);
@@ -413,7 +413,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_INTERRUPT_CONFIG_REQUEST:
                         if(l2cap_check_flag(L2CAP_FLAG_CONFIG_INTERRUPT_SUCCESS)) { // Now the HID channels is established
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nHID Interrupt Successfully Configured"), 0x80);
+                                Notify(PSTR("\nHID Interrupt Successfully Configured"), 0x80);
 #endif
                                 if(remote_name_first == 'M') { // First letter in Motion Controller ('M')
                                         memset(l2capinbuf, 0, BULK_MAXPKTSIZE); // Reset l2cap in buffer as it sometimes read it as a button has been pressed
@@ -429,7 +429,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_INTERRUPT_DISCONNECT:
                         if(l2cap_check_flag(L2CAP_FLAG_DISCONNECT_INTERRUPT_RESPONSE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nDisconnected Interrupt Channel"), 0x80);
+                                Notify(PSTR("\nDisconnected Interrupt Channel"), 0x80);
 #endif
                                 identifier++;
                                 pBtd->l2cap_disconnection_request(hci_handle, identifier, control_scid, control_dcid);
@@ -440,7 +440,7 @@ void PS3BT::L2CAP_task() {
                 case L2CAP_CONTROL_DISCONNECT:
                         if(l2cap_check_flag(L2CAP_FLAG_DISCONNECT_CONTROL_RESPONSE)) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nDisconnected Control Channel"), 0x80);
+                                Notify(PSTR("\nDisconnected Control Channel"), 0x80);
 #endif
                                 pBtd->hci_disconnect(hci_handle);
                                 hci_handle = -1; // Reset handle
@@ -468,18 +468,18 @@ void PS3BT::Run() {
                         if((int32_t)((uint32_t)millis() - timer) > 1000) { // loop 1 second before sending the command
                                 if(remote_name_first == 'P') { // First letter in PLAYSTATION(R)3 Controller ('P')
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nDualshock 3 Controller Enabled\r\n"), 0x80);
+                                        Notify(PSTR("\nDualshock 3 Controller Enabled\n"), 0x80);
 #endif
                                         PS3Connected = true;
                                 } else if(remote_name_first == 'N') { // First letter in Navigation Controller ('N')
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nNavigation Controller Enabled\r\n"), 0x80);
+                                        Notify(PSTR("\nNavigation Controller Enabled\n"), 0x80);
 #endif
                                         PS3NavigationConnected = true;
                                 } else if(remote_name_first == 'M') { // First letter in Motion Controller ('M')
                                         timer = (uint32_t)millis();
 #ifdef DEBUG_USB_HOST
-                                        Notify(PSTR("\r\nMotion Controller Enabled\r\n"), 0x80);
+                                        Notify(PSTR("\nMotion Controller Enabled\n"), 0x80);
 #endif
                                         PS3MoveConnected = true;
                                 }
@@ -617,7 +617,7 @@ void PS3BT::moveSetBulb(ColorsEnum color) { // Use this to set the Color using t
 void PS3BT::moveSetRumble(uint8_t rumble) {
 #ifdef DEBUG_USB_HOST
         if(rumble < 64 && rumble != 0) // The rumble value has to at least 64, or approximately 25% (64/255*100)
-                Notify(PSTR("\r\nThe rumble value has to at least 64, or approximately 25%"), 0x80);
+                Notify(PSTR("\nThe rumble value has to at least 64, or approximately 25%"), 0x80);
 #endif
         // Set the rumble value into the write buffer
         HIDMoveBuffer[7] = rumble;

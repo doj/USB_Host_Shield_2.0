@@ -59,7 +59,7 @@ void HexDumper<BASE_CLASS, LEN_TYPE, OFFSET_TYPE>::Parse(const LEN_TYPE len, con
                         E_Notify(PSTR(" "), 0x80);
 
                         if(byteCount == 15) {
-                                E_Notify(PSTR("\r\n"), 0x80);
+                                E_Notify(PSTR("\n"), 0x80);
                                 byteCount = 0xFF;
                         }
                 }

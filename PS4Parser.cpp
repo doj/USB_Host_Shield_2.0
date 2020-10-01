@@ -76,7 +76,7 @@ uint8_t PS4Parser::getAnalogHat(AnalogHatEnum a) {
 void PS4Parser::Parse(uint8_t len, uint8_t *buf) {
         if (len > 1 && buf)  {
 #ifdef PRINTREPORT
-                Notify(PSTR("\r\n"), 0x80);
+                Notify(PSTR("\n"), 0x80);
                 for (uint8_t i = 0; i < len; i++) {
                         D_PrintHex<uint8_t > (buf[i], 0x80);
                         Notify(PSTR(" "), 0x80);
@@ -88,7 +88,7 @@ void PS4Parser::Parse(uint8_t len, uint8_t *buf) {
                 else if (buf[0] == 0x11) { // This report is send via Bluetooth, it has an offset of 2 compared to the USB data
                         if (len < 4) {
 #ifdef DEBUG_USB_HOST
-                                Notify(PSTR("\r\nReport is too short: "), 0x80);
+                                Notify(PSTR("\nReport is too short: "), 0x80);
                                 D_PrintHex<uint8_t > (len, 0x80);
 #endif
                                 return;
@@ -96,7 +96,7 @@ void PS4Parser::Parse(uint8_t len, uint8_t *buf) {
                         memcpy(&ps4Data, buf + 3, min((uint8_t)(len - 3), MFK_CASTUINT8T sizeof(ps4Data)));
                 } else {
 #ifdef DEBUG_USB_HOST
-                        Notify(PSTR("\r\nUnknown report id: "), 0x80);
+                        Notify(PSTR("\nUnknown report id: "), 0x80);
                         D_PrintHex<uint8_t > (buf[0], 0x80);
 #endif
                         return;

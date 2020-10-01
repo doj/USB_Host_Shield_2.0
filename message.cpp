@@ -73,19 +73,19 @@ void E_Notify(double d, int lvl) {
 #ifdef DEBUG_USB_HOST
 
 void NotifyFailGetDevDescr(void) {
-        Notify(PSTR("\r\ngetDevDescr "), 0x80);
+        Notify(PSTR("\ngetDevDescr "), 0x80);
 }
 
 void NotifyFailSetDevTblEntry(void) {
-        Notify(PSTR("\r\nsetDevTblEn "), 0x80);
+        Notify(PSTR("\nsetDevTblEn "), 0x80);
 }
 
 void NotifyFailGetConfDescr(void) {
-        Notify(PSTR("\r\ngetConf "), 0x80);
+        Notify(PSTR("\ngetConf "), 0x80);
 }
 
 void NotifyFailSetConfDescr(void) {
-        Notify(PSTR("\r\nsetConf "), 0x80);
+        Notify(PSTR("\nsetConf "), 0x80);
 }
 
 void NotifyFailGetDevDescr(uint8_t reason) {
@@ -110,7 +110,7 @@ void NotifyFailSetConfDescr(uint8_t reason) {
 }
 
 void NotifyFailUnknownDevice(uint16_t VID, uint16_t PID) {
-        Notify(PSTR("\r\nUnknown Device Connected - VID: "), 0x80);
+        Notify(PSTR("\nUnknown Device Connected - VID: "), 0x80);
         D_PrintHex<uint16_t > (VID, 0x80);
         Notify(PSTR(" PID: "), 0x80);
         D_PrintHex<uint16_t > (PID, 0x80);
@@ -118,6 +118,6 @@ void NotifyFailUnknownDevice(uint16_t VID, uint16_t PID) {
 
 void NotifyFail(uint8_t rcode) {
         D_PrintHex<uint8_t > (rcode, 0x80);
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 }
 #endif

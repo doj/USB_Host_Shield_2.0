@@ -68,7 +68,7 @@ void ErrorMessage(uint8_t level, char const * msg, ERROR_TYPE rcode = 0) {
         Notify(msg, level);
         Notify(PSTR(": "), level);
         D_PrintHex<ERROR_TYPE > (rcode, level);
-        Notify(PSTR("\r\n"), level);
+        Notify(PSTR("\n"), level);
 #endif
 }
 
@@ -78,7 +78,7 @@ void ErrorMessage(char const * msg __attribute__((unused)), ERROR_TYPE rcode __a
         Notify(msg, 0x80);
         Notify(PSTR(": "), 0x80);
         D_PrintHex<ERROR_TYPE > (rcode, 0x80);
-        Notify(PSTR("\r\n"), 0x80);
+        Notify(PSTR("\n"), 0x80);
 #endif
 }
 
