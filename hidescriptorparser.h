@@ -14,9 +14,7 @@ Circuits At Home, LTD
 Web      :  http://www.circuitsathome.com
 e-mail   :  support@circuitsathome.com
  */
-#if !defined(__HIDDESCRIPTORPARSER_H__)
-#define __HIDDESCRIPTORPARSER_H__
-
+#pragma once
 #include "usbhid.h"
 
 class ReportDescParserBase : public USBReadParser {
@@ -37,9 +35,6 @@ public:
         static void PrintDigitizerPageUsage(uint16_t usage);
         static void PrintAlphanumDisplayPageUsage(uint16_t usage);
         static void PrintMedicalInstrumentPageUsage(uint16_t usage);
-
-        static void PrintValue(uint8_t *p, uint8_t len);
-        static void PrintByteValue(uint8_t data);
 
         static void PrintItemTitle(uint8_t prefix);
 
@@ -103,15 +98,14 @@ protected:
         ByteSkipper theSkipper;
         uint8_t varBuffer[sizeof (USB_CONFIGURATION_DESCRIPTOR)];
 
-        uint8_t itemParseState; // Item parser state variable
-        uint8_t itemSize; // Item size
-        uint8_t itemPrefix; // Item prefix (first byte)
-        uint8_t rptSize; // Report Size
-        uint8_t rptCount; // Report Count
+        uint8_t itemParseState; ///< Item parser state variable
+        uint8_t itemSize; ///< Item size
+        uint8_t itemPrefix; ///< Item prefix (first byte)
+        uint8_t rptSize; ///< Report Size
+        uint8_t rptCount; ///< Report Count
 
-        uint16_t totalSize; // Report size in bits
+        uint16_t totalSize; ///< Report size in bits
 
-        // Method should be defined here if virtual.
         virtual uint8_t ParseItem(uint8_t **pp, uint16_t *pcntdn);
 
         UsagePageFunc pfUsage;
@@ -120,7 +114,6 @@ protected:
         void SetUsagePage(uint16_t page);
 
 public:
-
         ReportDescParserBase() :
         itemParseState(0),
         itemSize(0),
@@ -131,14 +124,15 @@ public:
                 theBuffer.pValue = varBuffer;
                 valParser.Initialize(&theBuffer);
                 theSkipper.Initialize(&theBuffer);
-        };
+        }
 
-        void Parse(const uint16_t len, const uint8_t *pbuf, const uint16_t &offset);
+        void Parse(const uint16_t len, const uint8_t *pbuf, const uint16_t &offset) override;
 
         enum {
-                enErrorSuccess = 0
-                , enErrorIncomplete // value or record is partialy read in buffer
-                , enErrorBufferTooSmall
+	  enErrorSuccess = 0,
+	  enErrorIncomplete = 1, ///< value or record is partialy read in buffer
+	  enErrorBufferTooSmall = 2,
+	  enErrorParse = 3,
         };
 };
 
@@ -146,31 +140,26 @@ class ReportDescParser : public ReportDescParserBase {
 };
 
 class ReportDescParser2 : public ReportDescParserBase {
-        uint8_t rptId; // Report ID
-        uint8_t useMin; // Usage Minimum
-        uint8_t useMax; // Usage Maximum
-        uint8_t fieldCount; // Number of field being currently processed
+        uint8_t rptId;  ///< Report ID
+        uint8_t useMin; ///< Usage Minimum
+        uint8_t useMax; ///< Usage Maximum
+        uint8_t fieldCount; ///< Number of field being currently processed
 
-        void OnInputItem(uint8_t itm); // Method which is called every time Input item is found
+	/// Method which is called every time Input item is found
+        void OnInputItem(uint8_t itm);
 
-        uint8_t *pBuf; // Report buffer pointer
-        uint8_t bLen; // Report length
+        const uint8_t *pBuf;   ///< Report buffer pointer
+        const uint16_t bufLen; ///< Report length
 
 protected:
-        // Method should be defined here if virtual.
         virtual uint8_t ParseItem(uint8_t **pp, uint16_t *pcntdn);
 
 public:
-
-        ReportDescParser2(uint16_t len, uint8_t *pbuf) :
-        ReportDescParserBase(), rptId(0), useMin(0), useMax(0), fieldCount(0), pBuf(pbuf), bLen(len) {
-        };
+        ReportDescParser2(const uint16_t len, const uint8_t *pbuf) :
+        ReportDescParserBase(), rptId(0), useMin(0), useMax(0), fieldCount(0), pBuf(pbuf), bufLen(len) { }
 };
 
 class UniversalReportParser : public HIDReportParser {
 public:
-        // Method should be defined here if virtual.
         virtual void Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf);
 };
-
-#endif // __HIDDESCRIPTORPARSER_H__

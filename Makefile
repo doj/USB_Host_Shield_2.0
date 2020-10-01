@@ -39,6 +39,7 @@ clean:
 doxygen:
 	doxygen doc/Doxyfile
 
+.PHONY:	doc
 doc:	doxygen
 	if [ `uname` = Darwin ] ; then open doc/html/index.html ; else $(BROWSER) doc/html/index.html ; fi
 
