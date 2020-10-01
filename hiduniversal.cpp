@@ -247,11 +247,10 @@ uint8_t HIDUniversal::Init(uint8_t parent, uint8_t port, bool lowspeed) {
                         goto FailSetIdle;
         }
 
-        USBTRACE22("HU configured ", VID, PID);
-
         OnInitSuccessful();
 
         bPollEnable = true;
+        USBTRACE22("HU configured ", VID, PID);
         return 0;
 
 FailGetDevDescr:
