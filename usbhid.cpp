@@ -92,3 +92,11 @@ void USBHID::PrintHidDescriptor(const USB_HID_DESCRIPTOR *pDesc) {
         Notify(PSTR("\r\nwDescriptorLength:\t"), 0x80);
         D_PrintHex<uint16_t > (pDesc->wDescriptorLength, 0x80);
 }
+
+uint8_t
+USBHID::SndRpt(uint16_t nbytes, uint8_t *dataptr)
+{
+  (void)nbytes;
+  (void)dataptr;
+  return USB_ERROR_INVALID_ARGUMENT;
+}
