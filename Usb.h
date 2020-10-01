@@ -21,9 +21,7 @@ Circuits At Home, LTD
 Web      :  http://www.circuitsathome.com
 e-mail   :  support@circuitsathome.com
  */
-/* USB functions */
-#ifndef _usb_h_
-#define _usb_h_
+#pragma once
 
 // WARNING: Do not change the order of includes, or stuff will break!
 #include <inttypes.h>
@@ -44,5 +42,4 @@ e-mail   :  support@circuitsathome.com
 #include "UsbCore.h"
 #include "parsetools.h"
 #include "confdescparser.h"
-
-#endif //_usb_h_
+#include "version.h"
