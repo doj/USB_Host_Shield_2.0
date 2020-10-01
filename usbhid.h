@@ -14,8 +14,7 @@ Circuits At Home, LTD
 Web      :  http://www.circuitsathome.com
 e-mail   :  support@circuitsathome.com
  */
-#if !defined(__USBHID_H__)
-#define __USBHID_H__
+#pragma once
 
 #include "Usb.h"
 #include "hidusagestr.h"
@@ -142,8 +141,8 @@ public:
 
 class USBHID : public USBDeviceConfig, public UsbConfigXtracter {
 protected:
-        USB *pUsb; // USB class instance pointer
-        uint8_t bAddress; // address
+        USB *pUsb; ///< USB class instance pointer
+        uint8_t bAddress; ///< address
 
 protected:
         static const uint8_t epInterruptInIndex = 1; // InterruptIN  endpoint index
@@ -183,6 +182,8 @@ public:
         uint8_t GetHidDescr(uint8_t ep, uint16_t nbytes, uint8_t* dataptr);
         uint8_t GetReport(uint8_t ep, uint8_t iface, uint8_t report_type, uint8_t report_id, uint16_t nbytes, uint8_t* dataptr);
         uint8_t SetReport(uint8_t ep, uint8_t iface, uint8_t report_type, uint8_t report_id, uint16_t nbytes, uint8_t* dataptr);
-};
 
-#endif // __USBHID_H__
+        /// Send a report to the epInterruptOutIndex.
+        /// Do not confuse this method with SetReport()!
+        virtual uint8_t SndRpt(uint16_t nbytes, uint8_t *dataptr);
+};

@@ -22,6 +22,7 @@ Web      :  http://www.circuitsathome.com
 e-mail   :  support@circuitsathome.com
  */
 #pragma once
+#define _usb_h_ 1
 
 // WARNING: Do not change the order of includes, or stuff will break!
 #include <inttypes.h>

@@ -14,8 +14,7 @@ Circuits At Home, LTD
 Web      :  http://www.circuitsathome.com
 e-mail   :  support@circuitsathome.com
  */
-#if !defined(__HIDBOOT_H__)
-#define __HIDBOOT_H__
+#pragma once
 
 #include "usbhid.h"
 
@@ -226,21 +225,24 @@ public:
                 return true;
         };
 
-        // USBDeviceConfig implementation
+        ///@name USBDeviceConfig implementation
+        ///@{
         uint8_t Init(uint8_t parent, uint8_t port, bool lowspeed);
         uint8_t Release();
         uint8_t Poll();
 
         virtual uint8_t GetAddress() {
                 return bAddress;
-        };
+        }
 
         virtual bool isReady() {
                 return bPollEnable;
-        };
+        }
+        ///@}
 
-        // UsbConfigXtracter implementation
+        ///@name UsbConfigXtracter implementation
         // Method should be defined here if virtual.
+        ///@{
         virtual void EndpointXtract(uint8_t conf, uint8_t iface, uint8_t alt, uint8_t proto, const USB_ENDPOINT_DESCRIPTOR *ep);
 
         virtual bool DEVCLASSOK(uint8_t klass) {
@@ -250,6 +252,7 @@ public:
         virtual bool DEVSUBCLASSOK(uint8_t subklass) {
                 return (subklass == BOOT_PROTOCOL);
         }
+        ///@}
 };
 
 template <const uint8_t BOOT_PROTOCOL>
@@ -624,5 +627,3 @@ uint8_t HIDBoot<BOOT_PROTOCOL>::Poll() {
         }
         return rcode;
 }
-
-#endif // __HIDBOOTMOUSE_H__

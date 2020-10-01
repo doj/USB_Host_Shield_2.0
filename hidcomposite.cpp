@@ -409,7 +409,8 @@ uint8_t HIDComposite::Poll() {
         return rcode;
 }
 
-// Send a report to interrupt out endpoint. This is NOT SetReport() request!
-uint8_t HIDComposite::SndRpt(uint16_t nbytes, uint8_t *dataptr) {
+uint8_t
+HIDComposite::SndRpt(uint16_t nbytes, uint8_t *dataptr)
+{
         return pUsb->outTransfer(bAddress, epInfo[epInterruptOutIndex].epAddr, nbytes, dataptr);
 }
