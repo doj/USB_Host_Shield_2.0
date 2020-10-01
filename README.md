@@ -1,21 +1,25 @@
 # USB Host Library Rev.2.0
 
 The code is released under the GNU General Public License.
-__________
-[![Build Status](https://travis-ci.org/felis/USB_Host_Shield_2.0.svg?branch=master)](https://travis-ci.org/felis/USB_Host_Shield_2.0)
 
 # Summary
-This is Revision 2.0 of MAX3421E-based USB Host Shield Library for AVR's.
 
-Project main web site is: <https://chome.nerpa.tech/arduino_usb_host_shield_projects/>.
+This is Revision 2.0 of the MAX3421E-based USB Host Shield Library for AVR's.
 
-Some information can also be found at: <http://blog.tkjelectronics.dk/>.
+The project main web site is:
+https://chome.nerpa.tech/arduino_usb_host_shield_projects/ (offline,
+use the Google cache)
 
-The shield can be purchased from [TKJ Electronics](http://tkjelectronics.com/): <http://shop.tkjelectronics.dk/product_info.php?products_id=43>.
+Some information can also be found at: http://blog.tkjelectronics.dk/?s=usb+host+shield
+
+The shield can be purchased from
+[TKJ Electronics](http://tkjelectronics.com/):
+<http://shop.tkjelectronics.dk/product_info.php?products_id=43> and <http://shop.tkjelectronics.dk/product_info.php?cPath=22&products_id=45>.
+You also find them on https://www.aliexpress.com/
 
 ![USB Host Shield](http://shop.tkjelectronics.dk/images/USB_Host_Shield1.jpg)
 
-For more information about the hardware see the [Hardware Manual](https://chome.nerpa.tech/usb-host-shield-hardware-manual/).
+For more information about the hardware see the [Hardware Manual](doc/USBHostShieldHardwareManual.pdf).
 
 # Developed By
 
@@ -31,6 +35,8 @@ For more information about the hardware see the [Hardware Manual](https://chome.
 * __Yuuichi Akagawa__ - [@YuuichiAkagawa](https://twitter.com/yuuichiakagawa)
     * Developer of the [MIDI](#midi-library) library
 
+This version is a fork by Dirk Jagdmann <doj@cubic.org> from the
+original github repository https://github.com/felis/USB_Host_Shield_2.0
 
 # Table of Contents
 
@@ -67,9 +73,7 @@ Please see the following page for instructions: <http://www.arduino.cc/en/Guide/
 
 ### Manual installation
 
-First download the library by clicking on the following link: <https://github.com/felis/USB_Host_Shield_2.0/archive/master.zip>.
-
-Then uncompress the zip folder and rename the directory to "USB\_Host\_Shield\_20", as any special characters are not supported by the Arduino IDE.
+Clone this git repository, then rename the directory to "USB\_Host\_Shield\_20", as any special characters are not supported by the Arduino IDE.
 
 Now open up the Arduino IDE and open "File>Preferences". There you will see the location of your sketchbook. Open that directory and create a directory called "libraries" inside that directory.
 Now move the "USB\_Host\_Shield\_20" directory to the "libraries" directory.
@@ -90,7 +94,12 @@ For more information visit the following sites: <http://arduino.cc/en/Guide/Libr
 
 ### Documentation
 
-Documentation for the library can be found at the following link: <https://felis.github.io/USB_Host_Shield_2.0/>.
+If you have the [doxygen](https://www.doxygen.nl/) program installed,
+you can generate source code documentation by running:
+
+```shell
+$ make doc
+```
 
 ### Enable debugging
 
@@ -165,6 +174,7 @@ Take a look at the [SPP.ino](examples/Bluetooth/SPP/SPP.ino) example for more in
 More information can be found at these blog posts:
 
 * <http://chome.nerpa.tech/mcu/bluetooth-rfcommspp-service-support-for-usb-host-2-0-library-released>
+  (offline, use the Google cache)
 * <http://blog.tkjelectronics.dk/2012/07/rfcommspp-library-for-arduino/>
 
 To implement the SPP protocol I used a Bluetooth sniffing tool called [PacketLogger](http://www.tkjelectronics.com/uploads/PacketLogger.zip) developed by Apple.
