@@ -450,7 +450,7 @@ uint8_t USB::dispatchPkt(uint8_t token, uint8_t ep, uint16_t nak_limit) {
                         case hrNAK:
                                 nak_count++;
                                 if(nak_limit && (nak_count == nak_limit)) {
-                                        USBTRACE22("USB::dispatchPkt hrNAK ",(int)nak_count, (int)nak_limit);
+                                        //USBTRACE22("USB::dispatchPkt hrNAK ",(int)nak_count, (int)nak_limit);
                                         return (rcode);
                                 }
                                 break;
