@@ -1,3 +1,4 @@
+// -*- c-basic-offset: 8; tab-width: 8; indent-tabs-mode: nil; mode: c++ -*-
 /* Copyright (C) 2011 Circuits At Home, LTD. All rights reserved.
 
 This software may be distributed and modified under the terms of the GNU
@@ -117,14 +118,16 @@ uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_l
         return 0;
 }
 
-/* Control transfer. Sets address, endpoint, fills control packet with necessary data, dispatches control packet, and initiates bulk IN transfer,   */
-/* depending on request. Actual requests are defined as inlines                                                                                      */
-/* return codes:                */
-/* 00       =   success         */
-
-/* 01-0f    =   non-zero HRSLT  */
+/**
+ * Control transfer.
+ * Sets address, endpoint, fills control packet with necessary data, dispatches control packet, and initiates bulk IN transfer, depending on request.
+ * The actual requests are defined as inlines.
+ * @return 0 upon success.
+ * @return 01-0f upon non-zero HRSLT.
+ */
 uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bRequest, uint8_t wValLo, uint8_t wValHi,
-        uint16_t wInd, uint16_t total, uint16_t nbytes, uint8_t* dataptr, USBReadParser *p) {
+        uint16_t wInd, uint16_t total, uint16_t nbytes, uint8_t* dataptr, USBReadParser *p)
+{
         bool direction = false; //request direction, IN or OUT
         uint8_t rcode;
         SETUP_PKT setup_pkt;
@@ -133,9 +136,10 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
         uint16_t nak_limit = 0;
 
         rcode = SetAddress(addr, ep, &pep, &nak_limit);
-
-        if(rcode)
+        if (rcode) {
+                //USBTRACE2("\r\nUSB::ctrlReq!SetAddress:", rcode);
                 return rcode;
+        }
 
         direction = ((bmReqType & 0x80) > 0);
 
@@ -150,9 +154,11 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
         bytesWr(rSUDFIFO, 8, (uint8_t*) & setup_pkt); //transfer to setup packet FIFO
 
         rcode = dispatchPkt(tokSETUP, ep, nak_limit); //dispatch packet
-
-        if(rcode) //return HRSLT if not zero
-                return ( rcode);
+        if (rcode) {
+                //return HRSLT if not zero
+                //USBTRACE2("\r\nUSB::ctrlReq!dispatchPkt:", rcode);
+                return rcode;
+        }
 
         if(dataptr != NULL) //data stage, if present
         {
@@ -165,7 +171,7 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
                         while(left) {
                                 // Bytes read into buffer
 #if defined(ESP8266) || defined(ESP32)
-                        yield(); // needed in order to reset the watchdog timer on the ESP8266
+                                yield(); // needed in order to reset the watchdog timer on the ESP8266
 #endif
                                 uint16_t read = nbytes;
                                 //uint16_t read = (left<nbytes) ? left : nbytes;
@@ -177,11 +183,13 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
                                         continue;
                                 }
 
-                                if(rcode)
+                                if (rcode) {
+                                        //USBTRACE2("\r\nUSB::ctrlReq!InTransfer:", rcode);
                                         return rcode;
+                                }
 
                                 // Invoke callback function if inTransfer completed successfully and callback function pointer is specified
-                                if(!rcode && p)
+                                if(p)
                                         ((USBReadParser*)p)->Parse(read, dataptr, total - left);
 
                                 left -= read;
@@ -193,12 +201,18 @@ uint8_t USB::ctrlReq(uint8_t addr, uint8_t ep, uint8_t bmReqType, uint8_t bReque
                 {
                         pep->bmSndToggle = 1; //bmSNDTOG1;
                         rcode = OutTransfer(pep, nak_limit, nbytes, dataptr);
+                        if (rcode) {
+                                //USBTRACE2("\r\nUSB::ctrlReq!OutTransfer:", rcode);
+                                return rcode;
+                        }
                 }
-                if(rcode) //return error
-                        return ( rcode);
         }
         // Status stage
-        return dispatchPkt((direction) ? tokOUTHS : tokINHS, ep, nak_limit); //GET if direction
+        rcode = dispatchPkt((direction) ? tokOUTHS : tokINHS, ep, nak_limit); //GET if direction
+        if (rcode) {
+                //USBTRACE2("\r\nUSB::ctrlReq!dispatchPkt:", rcode);
+        }
+        return rcode;
 }
 
 /* IN transfer to arbitrary endpoint. Assumes PERADDR is set. Handles multiple packets if necessary. Transfers 'nbytes' bytes. */
