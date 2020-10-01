@@ -15,34 +15,32 @@
 class HIDUniversal2 : public HIDUniversal
 {
 public:
-    HIDUniversal2(USB *usb) : HIDUniversal(usb) {};
+    HIDUniversal2(USB *usb) : HIDUniversal(usb) {}
 
 protected:
-    uint8_t OnInitSuccessful();
+    uint8_t OnInitSuccessful() override;
 };
 
-uint8_t HIDUniversal2::OnInitSuccessful()
+uint8_t
+HIDUniversal2::OnInitSuccessful()
 {
+    Serial.println("OnInitSuccessful()");
     uint8_t    rcode;
 
     HexDumper<USBReadParser, uint16_t, uint16_t>    Hex;
     ReportDescParser                                Rpt;
 
-    if ((rcode = GetReportDescr(0, &Hex)))
-        goto FailGetReportDescr1;
+    if ((rcode = GetReportDescr(0, &Hex))) {
+        Serial.println("failed report descriptor hex");
+        goto Fail;
+    }
 
-    if ((rcode = GetReportDescr(0, &Rpt)))
-	goto FailGetReportDescr2;
+    if ((rcode = GetReportDescr(0, &Rpt))) {
+        Serial.println("failed report descriptor");
+        goto Fail;
+    }
 
     return 0;
-
-FailGetReportDescr1:
-    USBTRACE("GetReportDescr1:");
-    goto Fail;
-
-FailGetReportDescr2:
-    USBTRACE("GetReportDescr2:");
-    goto Fail;
 
 Fail:
     Serial.println(rcode, HEX);
@@ -51,7 +49,7 @@ Fail:
 }
 
 USB Usb;
-//USBHub Hub(&Usb);
+USBHub Hub(&Usb);
 HIDUniversal2 Hid(&Usb);
 UniversalReportParser Uni;
 
